@@ -20,12 +20,11 @@ module.exports = (sequelize, DataTypes) => {
           "CE",
           "STORE_IN_CHARGE"
         ),
-        allowNull: false,
+        // defaultValue: "JE",
       },
       username: {
         type: STRING,
         unique: true,
-        allowNull: false,
       },
       email: {
         type: STRING,
@@ -34,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       password: {
         type: STRING,
-        allowNull: false,
+        // allowNull: false,
       },
       is_active: {
         type: BOOLEAN,
