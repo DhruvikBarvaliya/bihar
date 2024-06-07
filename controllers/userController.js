@@ -72,9 +72,12 @@ exports.listUsers = async (req, res) => {
     });
 
     logger.info(`Users listed, page ${page}`);
+
     res.status(200).json({
-      users: userList,
+      totalItems: users.count,
       totalPages,
+      currentPage: parseInt(page),
+      users: userList,
     });
   } catch (error) {
     logger.error(error);
@@ -115,9 +118,21 @@ exports.searchUsers = async (req, res) => {
     });
     const totalPages = Math.ceil(users.count / limit);
     logger.info(`Users searched with keyword "${keyword}", page ${page}`);
+
+    // Convert each user to JSON and remove password field
+    const userList = users.rows.map((user) => {
+      const userJSON = user.toJSON();
+      delete userJSON.password;
+      delete userJSON.verified_otp;
+      delete userJSON.forgot_otp;
+      return userJSON;
+    });
+
     res.status(200).json({
-      users: users.rows,
+      totalItems: users.count,
       totalPages,
+      currentPage: parseInt(page),
+      users: userList,
     });
   } catch (error) {
     logger.error(error);
