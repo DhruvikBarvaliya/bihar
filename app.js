@@ -22,8 +22,8 @@ app.get("/", function (req, res) {
   const port = process.env.PORT;
   const fullUrl =
     env === "development"
-      ? `${http}://${hostname}:${port}${originalUrl}`
-      : `${https}://${hostname}:${originalUrl}`;
+      ? `http://${hostname}:${port}${originalUrl}`
+      : `https://${hostname}:${originalUrl}`;
   const message = `Welcome To ${env} Mode Of Bihar Management System`;
   const swaggerUrl = `${fullUrl}api-docs`;
   logger.info({ Message: message, Swagger: swaggerUrl });
