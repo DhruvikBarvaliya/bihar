@@ -50,7 +50,7 @@ const createDefaultUser = async (userData) => {
 };
 
 sequelize
-  .sync({ force: true, alter: true })
+  .sync({ force: false, alter: true })
   .then(async () => {
     logger.info("Drop and re-sync db.");
     const superAdmin = {
@@ -93,7 +93,7 @@ sequelize
 
 const serverUrl =
   env === "production"
-    ? `https://hospital-dyev.onrender.com`
+    ? `https://bihar-diop.onrender.com`
     : `http://localhost:${port}`;
 
 app.listen(
