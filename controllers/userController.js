@@ -5,11 +5,19 @@ const { Op } = require("sequelize");
 exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id);
+
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json(user);
+
+    // Convert user to JSON and remove password field
+    const userProfile = user.toJSON();
+    delete userProfile.password;
+    delete userProfile.verified_otp;
+    delete userProfile.forgot_otp;
+
+    res.status(200).json(userProfile);
   } catch (error) {
     logger.error(error);
     res.status(500).json({ message: "Server error", error });
@@ -18,7 +26,7 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   try {
-    const { username, email } = req.body;
+    const { username, role } = req.body;
     const user = await User.findByPk(req.params.id);
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
@@ -26,11 +34,18 @@ exports.updateUserProfile = async (req, res) => {
     }
 
     user.username = username || user.username;
-    user.email = email || user.email;
+    user.role = role || user.role;
+    // await User.update(req.body, { where: { id: req.params.id } });
 
     await user.save();
+
+    const userProfile = user.toJSON();
+    delete userProfile.password;
+    delete userProfile.verified_otp;
+    delete userProfile.forgot_otp;
+
     logger.info(`User profile updated for ID ${req.params.id}`);
-    res.status(200).json(user);
+    res.status(200).json(userProfile);
   } catch (error) {
     logger.error(error);
     res.status(500).json({ message: "Server error", error });
@@ -46,9 +61,19 @@ exports.listUsers = async (req, res) => {
       limit: parseInt(limit, 10),
     });
     const totalPages = Math.ceil(users.count / limit);
+
+    // Convert each user to JSON and remove password field
+    const userList = users.rows.map((user) => {
+      const userJSON = user.toJSON();
+      delete userJSON.password;
+      delete userJSON.verified_otp;
+      delete userJSON.forgot_otp;
+      return userJSON;
+    });
+
     logger.info(`Users listed, page ${page}`);
     res.status(200).json({
-      users: users.rows,
+      users: userList,
       totalPages,
     });
   } catch (error) {
@@ -82,8 +107,8 @@ exports.searchUsers = async (req, res) => {
       where: {
         [Op.or]: [
           { username: { [Op.like]: `%${keyword}%` } },
-          { email: { [Op.like]: `%${keyword}%` } }
-        ]
+          { email: { [Op.like]: `%${keyword}%` } },
+        ],
       },
       offset: parseInt(offset, 10),
       limit: parseInt(limit, 10),

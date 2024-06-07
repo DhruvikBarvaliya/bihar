@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
           "CE",
           "STORE_IN_CHARGE"
         ),
-        // defaultValue: "JE",
       },
       username: {
         type: STRING,
@@ -33,11 +32,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       password: {
         type: STRING,
-        // allowNull: false,
       },
       is_active: {
         type: BOOLEAN,
-        defaultValue: true,
+        defaultValue: false,
       },
       is_verified: {
         type: BOOLEAN,

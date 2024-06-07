@@ -9,27 +9,56 @@ exports.register = async (req, res) => {
   try {
     const { username, password, email, role, verified_otp } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const existingUser = await User.findOne({ where: { email } });
+    let user = await User.findOne({ where: { email } });
 
-    if (existingUser) {
-      logger.info(`User with email ${email} already registered`);
-      return res.status(400).json({ message: "User Already registered" });
+    if (!user) {
+      logger.error("User not found");
+      return res.status(400).json({ message: "User not found" });
     }
 
-    if (existingUser.verified_otp !== verified_otp) {
+    // Check if user's role is provided
+    if (!role) {
+      logger.error("Role is mandatory");
+      return res.status(400).json({ message: "Role is mandatory" });
+    }
+
+    // Check if OTP is provided
+    if (!verified_otp) {
+      logger.error("OTP is mandatory");
+      return res.status(400).json({ message: "OTP is mandatory" });
+    }
+    // Check if OTP has expired (more than 2 minutes since last update)
+    if (new Date() - new Date(user.dataValues.updatedAt) > 2 * 60 * 1000) {
+      user.verified_otp = null;
+      logger.error("OTP expired");
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    // Verify OTP
+    if (user.verified_otp !== verified_otp) {
       logger.error("Invalid OTP");
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    const user = await User.create({
-      username,
-      password: hashedPassword,
-      email,
-      role,
-    });
+    // Update user details
+    user.email = email || user.email;
+    user.username = username;
+    user.role = role;
+    user.password = hashedPassword;
+    user.is_active = true;
+
+    user = await user.save();
+
+    // Serialize user instance to JSON and remove sensitive fields
+    const userJSON = user.toJSON();
+    delete userJSON.password;
+    delete userJSON.verified_otp;
+    delete userJSON.forgot_otp;
 
     logger.info(`User with email ${email} registered successfully`);
-    res.status(201).json({ message: "User registered successfully", user });
+    res
+      .status(201)
+      .json({ message: "User registered successfully", user: userJSON });
   } catch (error) {
     logger.error(`Register error: ${error.message}`);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -63,20 +92,23 @@ exports.login = async (req, res) => {
 exports.sendOtp = async (req, res) => {
   try {
     const { email, type } = req.body;
-    const user = await User.findOne({ where: { email } });
 
-    if (type === "verify" && user) {
-      logger.info(`User with email ${email} already registered`);
-      return res.status(400).json({ message: "User Already registered" });
-    } else if (type === "forgot" && !user) {
-      logger.info(`User with email ${email} not found`);
-      return res.status(404).json({ message: "User not found" });
-    }
+    // Find user by email
+    let user = await User.findOne({ where: { email } });
 
+    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
+    // Update user with OTP
     if (type === "verify") {
-      await User.create({ email, verified_otp: otp });
+      // If user exists, update OTP, else create new user
+      if (user) {
+        user.verified_otp = otp;
+        await user.save();
+      } else {
+        let aa = await User.create({ email, verified_otp: otp });
+        console.log(aa.toJSON());
+      }
       await sendEmail(email, "Verified User OTP", `Your OTP is ${otp}`);
       logger.info(
         `OTP Sent successfully for verified user with email ${email}`
@@ -85,6 +117,7 @@ exports.sendOtp = async (req, res) => {
         .status(200)
         .json({ message: "OTP Sent successfully for verified user" });
     } else if (type === "forgot") {
+      // Update user's forgot OTP
       user.forgot_otp = otp;
       await user.save();
       await sendEmail(email, "Forgot Password OTP", `Your OTP is ${otp}`);
@@ -112,6 +145,16 @@ exports.forgotPassword = async (req, res) => {
     if (!user) {
       logger.info(`User with email ${email} not found`);
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if OTP has expired (more than 2 minutes since last update)
+    if (
+      user.dataValues.updatedAt &&
+      new Date() - new Date(user.dataValues.updatedAt) > 2 * 60 * 1000
+    ) {
+      user.forgot_otp = null;
+      logger.error("OTP expired");
+      return res.status(400).json({ message: "OTP expired" });
     }
 
     if (user.forgot_otp !== otp) {

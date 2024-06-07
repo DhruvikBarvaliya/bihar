@@ -50,7 +50,7 @@ const createDefaultUser = async (userData) => {
 };
 
 sequelize
-  .sync({ force: false, alter: true })
+  .sync({ force: true, alter: true })
   .then(async () => {
     logger.info("Drop and re-sync db.");
     const superAdmin = {
@@ -58,6 +58,7 @@ sequelize
       password: "superadmin",
       email: "superadmin@gmail.com",
       role: "SUPER_ADMIN",
+      is_verified: true,
     };
 
     const superAdminUser = await User.findOne({
@@ -75,6 +76,7 @@ sequelize
       password: "admin",
       email: "admin@gmail.com",
       role: "ADMIN",
+      is_verified: true,
     };
 
     const adminUser = await User.findOne({
