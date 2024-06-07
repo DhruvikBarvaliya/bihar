@@ -14,11 +14,14 @@ const sequelize = new Sequelize(
 
 const User = require("../models/user")(sequelize, Sequelize);
 const Inventory = require("../models/inventory")(sequelize, Sequelize);
-
+const Store = require("../models/store")(sequelize, Sequelize);
+const Requisition = require("../models/requisition")(sequelize, Sequelize);
 // Relationships
 
 module.exports = {
   sequelize,
   User,
   Inventory,
+  Store,
+  Requisition,
 };

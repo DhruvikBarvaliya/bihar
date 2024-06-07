@@ -1,4 +1,4 @@
-const { Inventory, InventoryMovement } = require("../config/sequelize");
+const { Inventory } = require("../config/sequelize");
 const { Op } = require("sequelize");
 const logger = require("../middlewares/logger");
 

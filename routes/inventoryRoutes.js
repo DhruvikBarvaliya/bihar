@@ -8,7 +8,7 @@ const authorize = require("../middlewares/authorize");
  * @swagger
  * components:
  *   schemas:
- *     InventoryItem:
+ *     Inventory:
  *       type: object
  *       required:
  *         - item_name

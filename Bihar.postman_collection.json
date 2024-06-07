@@ -594,6 +594,386 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Store",
+			"item": [
+				{
+					"name": "Create Store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Store 1\",\n    \"description\": \"A sample store\",\n    \"location\": \"Location 1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/store/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"store",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Stores",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/stores?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stores"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Store By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/stores/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stores",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Store 1\",\n  \"description\": \"An updated sample store\",\n  \"location\": \"Updated Location 1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/store/update/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"store",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/store/delete/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"store",
+								"delete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Requisition",
+			"item": [
+				{
+					"name": "Submit Requisition",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_name\": \"Item 1\",\n    \"quantity\": 10,\n    \"purpose\": \"Office Use\",\n    \"required_date\": \"2024-06-15\",\n    \"description\": \"Sample item description\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/requisitions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"requisitions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Requisition Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/requisitions/:id/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"requisitions",
+								":id",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Requisition",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Approved\",\n    \"notes\": \"Approved for purchase\",\n    \"comments\": \"All good\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/requisitions/:id/approve",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"requisitions",
+								":id",
+								"approve"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Requisitions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/requisitions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"requisitions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
