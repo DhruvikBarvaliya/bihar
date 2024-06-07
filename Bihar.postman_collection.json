@@ -11,7 +11,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Register",
+					"name": "Send OTP",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -22,7 +22,34 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"Password123!\",\n  \"email\": \"johndoe@example.com\",\n  \"role\": \"ADMIN\",\n  \"verified_otp\": 123456\n}"
+							"raw": "{\n    \"email\": \"2018echev031@ldce.ac.in\",\n    \"type\": \"verify\" //\"forgot\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/send-otp-email",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"send-otp-email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"Password123!\",\n  \"email\": \"2018echev031@ldce.ac.in\",\n  \"role\": \"JE\",\n  \"verified_otp\": 497331\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
@@ -62,7 +89,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\"\n}"
+							"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"admin\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/login",
@@ -72,33 +99,6 @@
 							"path": [
 								"auth",
 								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Send OTP",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"johndoe@example.com\",\n  \"type\": \"verify\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/send-otp-email",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"auth",
-								"send-otp-email"
 							]
 						}
 					},
@@ -116,7 +116,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"johndoe@example.com\",\n    \"otp\": 789456,\n    \"newPassword\": \"asd123\",\n    \"confirmPassword\": \"asd123\"\n}"
+							"raw": "{\n    \"email\": \"2018echev031@ldce.ac.in\",\n    \"otp\": 143256,\n    \"newPassword\": \"asd123\",\n    \"confirmPassword\": \"asd123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/forgot-password",
@@ -146,14 +146,14 @@
 							"raw": "{\n  \"currentPassword\": \"Password123!\",\n  \"newPassword\": \"NewPassword123!\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/auth/change-password/1",
+							"raw": "{{base_url}}/auth/change-password/406d158b-2b9b-4069-a198-d31bd4b6ecfc",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"auth",
 								"change-password",
-								"1"
+								"406d158b-2b9b-4069-a198-d31bd4b6ecfc"
 							]
 						}
 					},
@@ -414,12 +414,22 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users",
+							"raw": "{{base_url}}/users?page=1&limit=2",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "2"
+								}
 							]
 						}
 					},
@@ -427,9 +437,6 @@
 				},
 				{
 					"name": "Search User",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -448,10 +455,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"janedoe\",\n  \"password\": \"Password123!\",\n  \"email\": \"janedoe@example.com\",\n  \"role\": \"USER\"\n}"
-						},
 						"url": {
 							"raw": "{{base_url}}/users/search?keyword=super&page=1&limit=10",
 							"host": [
@@ -495,13 +498,19 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users/1",
+							"raw": "{{base_url}}/users/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"users",
-								"1"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6a0200fe-544e-4334-a78a-8cffd933aae4"
+								}
 							]
 						}
 					},
@@ -529,16 +538,22 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"janedoe\",\n  \"password\": \"NewPassword123!\",\n  \"email\": \"janedoe@example.com\",\n  \"role\": \"ADMIN\"\n}"
+							"raw": "{\n    \"username\": \"janedoe\",\n    \"role\": \"ADMIN\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/users/1",
+							"raw": "{{base_url}}/users/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"users",
-								"1"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6a0200fe-544e-4334-a78a-8cffd933aae4"
+								}
 							]
 						}
 					},
@@ -560,13 +575,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users/1",
+							"raw": "{{base_url}}/users/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"users",
-								"1"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6a0200fe-544e-4334-a78a-8cffd933aae4"
+								}
 							]
 						}
 					},

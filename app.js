@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const config = require("./config/config");
 const logger = require("./middlewares/logger");
 const indexRouter = require("./routes/index");
-const swaggerSetup = require("./swagger");
+const swaggerSetup = require("./config/swagger");
 const { sequelize, User } = require("./config/sequelize");
 
 const app = express();
