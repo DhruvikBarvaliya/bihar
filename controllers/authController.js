@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { User } = require("../config/sequelize");
+const { User,Store} = require("../config/sequelize");
 const config = require("../config/config");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
@@ -62,7 +62,13 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      include: {
+        model: Store,
+        as: 'store',
+      },
+    });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       logger.error("Invalid credentials");
@@ -70,13 +76,17 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role ,email:user.email,store_id:user.store_id},
       config.JWT_SECRET,
       { expiresIn: "12h" }
     );
 
     logger.info(`User with email ${email} logged in successfully`);
-    sendResponse(res, "success", "Login successful", { token });
+    delete user.dataValues.password;
+    delete user.dataValues.verified_otp;
+    delete user.dataValues.forgot_otp;
+
+    sendResponse(res, "success", "Login successful", { token ,user},);
   } catch (error) {
     logger.error(`Login error: ${error.message}`);
     sendResponse(res, "fail", "Server error", null, error.message);

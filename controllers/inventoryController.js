@@ -113,6 +113,37 @@ exports.getInventoryById = async (req, res) => {
     );
   }
 };
+exports.getInventoryByStoreId = async (req, res) => {
+  console.log("store_id", req.params.store_id);
+  try {
+    const { store_id } = req.params;
+    const inventory = await Inventory.findAll({
+      where: {
+        store_id: store_id,
+      },
+    });
+    if (!inventory) {
+      logger.error("Inventory not found");
+      sendResponse(res, "fail", "Inventory not found", null, null, {
+        inventoryId: id,
+      });
+    } else {
+      logger.info("Inventory retrieved by ID: ", JSON.stringify(inventory));
+      sendResponse(res, "success", "Inventory retrieved successfully", {
+        inventory,
+      });
+    }
+  } catch (error) {
+    logger.error("Error retrieving inventory by ID: ", JSON.stringify(error));
+    sendResponse(
+      res,
+      "fail",
+      "Error retrieving inventory",
+      null,
+      error.message
+    );
+  }
+};
 
 exports.updateInventory = async (req, res) => {
   try {

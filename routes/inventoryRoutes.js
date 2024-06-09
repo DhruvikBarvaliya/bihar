@@ -149,6 +149,28 @@ router.get("/inventory/:id", inventoryController.getInventoryById);
 
 /**
  * @swagger
+ * /inventory/store/{store_id}:
+ *   get:
+ *     summary: Get inventory item by Store ID
+ *     tags: [Inventory]
+ *     parameters:
+ *       - in: path
+ *         name: store_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Inventory retrieved successfully
+ *       404:
+ *         description: Inventory not found
+ *       500:
+ *         description: Server error
+ */
+router.get("/inventory/store/:store_id", inventoryController.getInventoryByStoreId);
+
+/**
+ * @swagger
  * /inventory/{id}:
  *   put:
  *     summary: Update inventory item by ID
