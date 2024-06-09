@@ -98,7 +98,12 @@ router.get("/:id", authenticate, storeController.getStoreById);
  *       400:
  *         description: Invalid input
  */
-router.post("/", authenticate, authorize(["ADMIN"]), storeController.createStore);
+router.post(
+  "/",
+  authenticate,
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  storeController.createStore,
+);
 
 /**
  * @swagger
@@ -131,7 +136,12 @@ router.post("/", authenticate, authorize(["ADMIN"]), storeController.createStore
  *       404:
  *         description: Store not found
  */
-router.put("/:id", authenticate, authorize(["ADMIN"]), storeController.updateStore);
+router.put(
+  "/:id",
+  authenticate,
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  storeController.updateStore,
+);
 
 /**
  * @swagger
@@ -152,6 +162,11 @@ router.put("/:id", authenticate, authorize(["ADMIN"]), storeController.updateSto
  *       404:
  *         description: Store not found
  */
-router.delete("/:id", authenticate, authorize(["Admin"]), storeController.deleteStore);
+router.delete(
+  "/:id",
+  authenticate,
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  storeController.deleteStore,
+);
 
 module.exports = router;

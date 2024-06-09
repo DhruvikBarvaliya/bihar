@@ -12,19 +12,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      description: {
+      code: {
         type: DataTypes.STRING,
+        allowNull: false,
       },
       location: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      description: {
+        type: DataTypes.STRING,
       },
     },
     {
       tableName: "stores",
       timestamps: true,
       underscored: true,
-    }
+    },
   );
 
   return Store;

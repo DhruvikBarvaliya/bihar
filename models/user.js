@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
           "EEE",
           "ESE",
           "CE",
-          "STORE_IN_CHARGE"
+          "STORE_IN_CHARGE",
         ),
       },
       username: {
@@ -47,12 +47,20 @@ module.exports = (sequelize, DataTypes) => {
       forgot_otp: {
         type: INTEGER,
       },
+      storeId: {
+        type: UUID,
+        references: {
+          model: "stores",
+          key: "id",
+        },
+        allowNull: false,
+      },
     },
     {
       tableName: "users",
       timestamps: true,
       underscored: true,
-    }
+    },
   );
 
   return User;

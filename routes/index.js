@@ -4,19 +4,11 @@ const authRoutes = require("./authRoutes");
 const userRoutes = require("./userRoutes");
 const inventoryRoutes = require("./inventoryRoutes");
 const storeRoutes = require("./storeRoutes");
-const requisitionRoutes = require("./requisitionRoutes");
 
 router.get("/", (req, res) => {
   res.send("Inside Index Router");
 });
 
-router.use(
-  "/v1",
-  authRoutes,
-  userRoutes,
-  inventoryRoutes,
-  storeRoutes,
-  requisitionRoutes
-);
+router.use("/v1", authRoutes, userRoutes, storeRoutes, inventoryRoutes);
 
 module.exports = router;

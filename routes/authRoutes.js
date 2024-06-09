@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
+const authenticate = require("../middlewares/authenticate");
+const authorize = require("../middlewares/authorize");
 
 /**
  * @swagger
@@ -63,7 +65,12 @@ const authController = require("../controllers/authController");
  *       500:
  *         description: Server error
  */
-router.put("/auth/register", authController.register);
+router.post(
+  "/auth/register",
+  authenticate,
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authController.register,
+);
 
 /**
  * @swagger
@@ -93,98 +100,6 @@ router.put("/auth/register", authController.register);
  *         description: Server error
  */
 router.post("/auth/login", authController.login);
-
-/**
- * @swagger
- * /auth/send-otp-email:
- *   post:
- *     summary: Send OTP email
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: johndoe@example.com
- *               type:
- *                 type: string
- *                 enum: [verify, forgot]
- *                 example: verify
- *     responses:
- *       200:
- *         description: OTP email sent successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: OTP sent successfully for verified user
- *       400:
- *         description: Invalid OTP type
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid OTP type
- *       404:
- *         description: User not found or already registered
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User not found
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Server error
- *                 error:
- *                   type: string
- */
-router.post("/auth/send-otp-email", authController.sendOtp);
-
-/**
- * @swagger
- * /auth/forgot-password:
- *   post:
- *     summary: Send password reset email
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: johndoe@example.com
- *     responses:
- *       200:
- *         description: Password reset email sent successfully
- *       404:
- *         description: User not found
- *       500:
- *         description: Server error
- */
-router.post("/auth/forgot-password", authController.forgotPassword);
 
 /**
  * @swagger

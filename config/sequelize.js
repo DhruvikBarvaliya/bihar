@@ -9,19 +9,46 @@ const sequelize = new Sequelize(
     dialect: config.dialect,
     pool: config.pool,
     logging: false,
-  }
+  },
 );
 
 const User = require("../models/user")(sequelize, Sequelize);
-const Inventory = require("../models/inventory")(sequelize, Sequelize);
 const Store = require("../models/store")(sequelize, Sequelize);
-const Requisition = require("../models/requisition")(sequelize, Sequelize);
+const Inventory = require("../models/inventory")(sequelize, Sequelize);
+const StoreInventory = require("../models/storeInventory")(
+  sequelize,
+  Sequelize,
+);
+
 // Relationships
+Store.hasMany(User, {
+  foreignKey: "storeId",
+  as: "users",
+});
+
+User.belongsTo(Store, {
+  foreignKey: "storeId",
+  as: "store",
+});
+
+Store.belongsToMany(Inventory, {
+  through: StoreInventory,
+  foreignKey: "storeId",
+  otherKey: "inventoryId",
+  as: "Inventory",
+});
+
+Inventory.belongsToMany(Store, {
+  through: StoreInventory,
+  foreignKey: "inventoryId",
+  otherKey: "storeId",
+  as: "stores",
+});
 
 module.exports = {
   sequelize,
   User,
-  Inventory,
   Store,
-  Requisition,
+  Inventory,
+  StoreInventory,
 };

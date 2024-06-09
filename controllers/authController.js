@@ -7,37 +7,21 @@ const logger = require("../middlewares/logger");
 
 exports.register = async (req, res) => {
   try {
-    const { username, password, email, role, verified_otp } = req.body;
+    const { username, password, email, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     let user = await User.findOne({ where: { email } });
 
-    if (!user) {
-      logger.error("User not found");
-      return res.status(400).json({ message: "User not found" });
+    if (user) {
+      logger.error("user already registered with this email");
+      return res
+        .status(400)
+        .json({ message: "user already registered with this email" });
     }
 
     // Check if user's role is provided
     if (!role) {
       logger.error("Role is mandatory");
       return res.status(400).json({ message: "Role is mandatory" });
-    }
-
-    // Check if OTP is provided
-    if (!verified_otp) {
-      logger.error("OTP is mandatory");
-      return res.status(400).json({ message: "OTP is mandatory" });
-    }
-    // Check if OTP has expired (more than 2 minutes since last update)
-    if (new Date() - new Date(user.dataValues.updatedAt) > 2 * 60 * 1000) {
-      user.verified_otp = null;
-      logger.error("OTP expired");
-      return res.status(400).json({ message: "OTP expired" });
-    }
-
-    // Verify OTP
-    if (user.verified_otp !== verified_otp) {
-      logger.error("Invalid OTP");
-      return res.status(400).json({ message: "Invalid OTP" });
     }
 
     // Update user details
@@ -78,104 +62,13 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role },
       config.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     logger.info(`User with email ${email} logged in successfully`);
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     logger.error(`Login error: ${error.message}`);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-exports.sendOtp = async (req, res) => {
-  try {
-    const { email, type } = req.body;
-
-    // Find user by email
-    let user = await User.findOne({ where: { email } });
-
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000);
-
-    // Update user with OTP
-    if (type === "verify") {
-      // If user exists, update OTP, else create new user
-      if (user) {
-        user.verified_otp = otp;
-        await user.save();
-      } else {
-        let aa = await User.create({ email, verified_otp: otp });
-        console.log(aa.toJSON());
-      }
-      await sendEmail(email, "Verified User OTP", `Your OTP is ${otp}`);
-      logger.info(
-        `OTP Sent successfully for verified user with email ${email}`
-      );
-      res
-        .status(200)
-        .json({ message: "OTP Sent successfully for verified user" });
-    } else if (type === "forgot") {
-      // Update user's forgot OTP
-      user.forgot_otp = otp;
-      await user.save();
-      await sendEmail(email, "Forgot Password OTP", `Your OTP is ${otp}`);
-      logger.info(
-        `OTP sent successfully for forgot password to user with email ${email}`
-      );
-      res
-        .status(200)
-        .json({ message: "OTP sent successfully for forgot password" });
-    } else {
-      logger.error("Invalid OTP type");
-      res.status(400).json({ message: "Invalid OTP type" });
-    }
-  } catch (error) {
-    logger.error(`Send OTP error: ${error.message}`);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-exports.forgotPassword = async (req, res) => {
-  try {
-    const { email, otp, newPassword, confirmPassword } = req.body;
-    const user = await User.findOne({ where: { email } });
-
-    if (!user) {
-      logger.info(`User with email ${email} not found`);
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if OTP has expired (more than 2 minutes since last update)
-    if (
-      user.dataValues.updatedAt &&
-      new Date() - new Date(user.dataValues.updatedAt) > 2 * 60 * 1000
-    ) {
-      user.forgot_otp = null;
-      logger.error("OTP expired");
-      return res.status(400).json({ message: "OTP expired" });
-    }
-
-    if (user.forgot_otp !== otp) {
-      logger.error("Invalid OTP");
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    if (newPassword !== confirmPassword) {
-      logger.error("New password and confirm password do not match");
-      return res
-        .status(400)
-        .json({ message: "New password and confirm password do not match" });
-    }
-
-    user.password = await bcrypt.hash(newPassword, 10);
-    await user.save();
-
-    logger.info(`Password reset successfully for user with email ${email}`);
-    res.status(200).json({ message: "Password reset successfully" });
-  } catch (error) {
-    logger.error(`Forgot Password error: ${error.message}`);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };

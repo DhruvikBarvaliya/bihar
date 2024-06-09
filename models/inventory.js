@@ -19,18 +19,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      unit: {
-        type: DataTypes.BIGINT,
-      },
       description: {
         type: DataTypes.STRING,
+      },
+      store_id: {
+        type: DataTypes.UUID,
+        references: {
+          model: "stores",
+          key: "id",
+        },
+        allowNull: false,
       },
     },
     {
       tableName: "inventories",
       timestamps: true,
       underscored: true,
-    }
+    },
   );
 
   return Inventory;

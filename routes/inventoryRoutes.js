@@ -69,8 +69,8 @@ const authorize = require("../middlewares/authorize");
 router.post(
   "/inventory/create",
   authenticate,
-  authorize(["ADMIN"]),
-  inventoryController.createInventory
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  inventoryController.createInventory,
 );
 
 /**
@@ -164,7 +164,7 @@ router.get("/inventory", authenticate, inventoryController.getAllInventory);
 router.get(
   "/inventory/search",
   authenticate,
-  inventoryController.searchInventory
+  inventoryController.searchInventory,
 );
 
 /**
@@ -196,7 +196,7 @@ router.get(
 router.get(
   "/inventory/:id",
   authenticate,
-  inventoryController.getInventoryById
+  inventoryController.getInventoryById,
 );
 
 /**
@@ -234,8 +234,8 @@ router.get(
 router.put(
   "/inventory/update/:id",
   authenticate,
-  authorize(["ADMIN"]),
-  inventoryController.updateInventory
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  inventoryController.updateInventory,
 );
 
 /**
@@ -263,8 +263,8 @@ router.put(
 router.delete(
   "/inventory/delete/:id",
   authenticate,
-  authorize(["Admin"]),
-  inventoryController.deleteInventory
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  inventoryController.deleteInventory,
 );
 
 module.exports = router;

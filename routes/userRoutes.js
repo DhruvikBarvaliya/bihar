@@ -82,8 +82,8 @@ const authorize = require("../middlewares/authorize");
 router.get(
   "/users",
   authenticate,
-  authorize(["ADMIN"]),
-  userController.listUsers
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  userController.listUsers,
 );
 
 /**
@@ -113,7 +113,13 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get("/users/search", authenticate, userController.searchUsers);
+router.get(
+  "/users/search",
+  authenticate,
+  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authenticate,
+  userController.searchUsers,
+);
 
 /**
  * @swagger
