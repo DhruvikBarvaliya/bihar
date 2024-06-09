@@ -1,9 +1,18 @@
 // routes/stores.js
+
 const express = require("express");
 const router = express.Router();
 const storeController = require("../controllers/storeController");
+const { body, param } = require("express-validator");
 const authenticate = require("../middlewares/authenticate");
 const authorize = require("../middlewares/authorize");
+
+/**
+ * @swagger
+ * tags:
+ *   name: Stores
+ *   description: API for managing stores
+ */
 
 /**
  * @swagger
@@ -24,13 +33,6 @@ const authorize = require("../middlewares/authorize");
  *           type: string
  *         location:
  *           type: string
- */
-
-/**
- * @swagger
- * tags:
- *   name: Stores
- *   description: API for managing stores
  */
 
 /**
@@ -102,7 +104,11 @@ router.post(
   "/store",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
-  storeController.createStore,
+  [
+    body("name").notEmpty().withMessage("Name is required"),
+    body("location").notEmpty().withMessage("Location is required"),
+  ],
+  storeController.createStore
 );
 
 /**
@@ -140,7 +146,12 @@ router.put(
   "/store/:id",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
-  storeController.updateStore,
+  [
+    param("id").isUUID().withMessage("Invalid store ID"),
+    body("name").notEmpty().withMessage("Name is required"),
+    body("location").notEmpty().withMessage("Location is required"),
+  ],
+  storeController.updateStore
 );
 
 /**
@@ -166,7 +177,8 @@ router.delete(
   "/store/:id",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
-  storeController.deleteStore,
+  [param("id").isUUID().withMessage("Invalid store ID")],
+  storeController.deleteStore
 );
 
 module.exports = router;

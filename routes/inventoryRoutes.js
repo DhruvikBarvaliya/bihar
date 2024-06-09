@@ -1,8 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const inventoryController = require("../controllers/inventoryController");
+const { validateInventory } = require("../validators/inventoryValidator");
 const authenticate = require("../middlewares/authenticate");
 const authorize = require("../middlewares/authorize");
+
+/**
+ * @swagger
+ * tags:
+ *   name: Inventory
+ *   description: Inventory management
+ */
 
 /**
  * @swagger
@@ -12,57 +20,42 @@ const authorize = require("../middlewares/authorize");
  *       type: object
  *       required:
  *         - item_name
+ *         - quantity
+ *         - is_available
+ *         - store_id
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
- *           description: The auto-generated id of the inventory item
  *         item_name:
  *           type: string
- *           description: The name of the inventory item
  *         quantity:
  *           type: integer
- *           description: The quantity of the inventory item
- *           default: 0
  *         is_available:
  *           type: boolean
- *           description: Availability status of the inventory item
- *           default: false
- *         unit:
- *           type: integer
- *           description: Unit of the inventory item
  *         description:
  *           type: string
- *           description: Description of the inventory item
- *         createdAt:
+ *         store_id:
  *           type: string
- *           format: date-time
- *           description: The date the inventory item was created
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: The date the inventory item was last updated
  */
 
 /**
  * @swagger
- * /inventory/create:
+ * /inventory:
  *   post:
- *     summary: Create new inventory item
+ *     summary: Create a new inventory item
  *     tags: [Inventory]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/InventoryItem'
+ *             $ref: '#/components/schemas/Inventory'
  *     responses:
  *       201:
- *         description: Inventory item created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/InventoryItem'
+ *         description: Inventory created successfully
+ *       400:
+ *         description: Validation errors
  *       500:
  *         description: Server error
  */
@@ -70,14 +63,15 @@ router.post(
   "/inventory",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
-  inventoryController.createInventory,
+  validateInventory,
+  inventoryController.createInventory
 );
 
 /**
  * @swagger
  * /inventory:
  *   get:
- *     summary: Get inventory overview
+ *     summary: Get all inventory items
  *     tags: [Inventory]
  *     parameters:
  *       - in: query
@@ -85,31 +79,14 @@ router.post(
  *         schema:
  *           type: integer
  *           default: 1
- *         description: The page number for pagination
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
  *           default: 10
- *         description: The number of items per page
  *     responses:
  *       200:
- *         description: Inventory overview retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 totalItems:
- *                   type: integer
- *                 totalPages:
- *                   type: integer
- *                 currentPage:
- *                   type: integer
- *                 inventory:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/InventoryItem'
+ *         description: Inventory retrieved successfully
  *       500:
  *         description: Server error
  */
@@ -124,47 +101,28 @@ router.get("/inventory", authenticate, inventoryController.getAllInventory);
  *     parameters:
  *       - in: query
  *         name: keyword
- *         required: true
  *         schema:
  *           type: string
- *         description: Keyword to search for in inventory items
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
  *           default: 1
- *         description: The page number for pagination
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
  *           default: 10
- *         description: The number of items per page
  *     responses:
  *       200:
- *         description: Inventory items retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 totalItems:
- *                   type: integer
- *                 totalPages:
- *                   type: integer
- *                 currentPage:
- *                   type: integer
- *                 inventory:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/InventoryItem'
+ *         description: Inventory search completed successfully
  *       500:
  *         description: Server error
  */
 router.get(
   "/inventory/search",
   authenticate,
-  inventoryController.searchInventory,
+  inventoryController.searchInventory
 );
 
 /**
@@ -179,31 +137,21 @@ router.get(
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
- *         description: ID of the inventory item to retrieve
  *     responses:
  *       200:
- *         description: Inventory item retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/InventoryItem'
+ *         description: Inventory retrieved successfully
  *       404:
- *         description: Inventory item not found
+ *         description: Inventory not found
  *       500:
  *         description: Server error
  */
-router.get(
-  "/inventory/:id",
-  authenticate,
-  inventoryController.getInventoryById,
-);
+router.get("/inventory/:id", inventoryController.getInventoryById);
 
 /**
  * @swagger
- * /inventory/update/{id}:
+ * /inventory/{id}:
  *   put:
- *     summary: Update inventory item
+ *     summary: Update inventory item by ID
  *     tags: [Inventory]
  *     parameters:
  *       - in: path
@@ -211,23 +159,17 @@ router.get(
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
- *         description: ID of the inventory item to update
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/InventoryItem'
+ *             $ref: '#/components/schemas/Inventory'
  *     responses:
  *       200:
- *         description: Inventory item updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/InventoryItem'
+ *         description: Inventory updated successfully
  *       404:
- *         description: Inventory item not found
+ *         description: Inventory not found
  *       500:
  *         description: Server error
  */
@@ -235,14 +177,15 @@ router.put(
   "/inventory/:id",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
-  inventoryController.updateInventory,
+  validateInventory,
+  inventoryController.updateInventory
 );
 
 /**
  * @swagger
- * /inventory/delete/{id}:
+ * /inventory/{id}:
  *   delete:
- *     summary: Delete inventory item
+ *     summary: Delete inventory item by ID
  *     tags: [Inventory]
  *     parameters:
  *       - in: path
@@ -250,13 +193,11 @@ router.put(
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
- *         description: ID of the inventory item to delete
  *     responses:
- *       204:
- *         description: Inventory item deleted successfully
+ *       200:
+ *         description: Inventory deleted successfully
  *       404:
- *         description: Inventory item not found
+ *         description: Inventory not found
  *       500:
  *         description: Server error
  */
@@ -264,7 +205,7 @@ router.delete(
   "/inventory/:id",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
-  inventoryController.deleteInventory,
+  inventoryController.deleteInventory
 );
 
 module.exports = router;

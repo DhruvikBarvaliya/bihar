@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../config/sequelize");
 const config = require("../config/config");
 const logger = require("../middlewares/logger");
+const sendResponse = require("../utils/responseHelper");
 
 exports.register = async (req, res) => {
   try {
@@ -13,22 +14,27 @@ exports.register = async (req, res) => {
 
     if (user) {
       logger.error("User Already Registered with this Email");
-      return res
-        .status(400)
-        .json({ message: "User Already Registered with this Email" });
+      return sendResponse(
+        res,
+        "fail",
+        "User Already Registered with this Email",
+        null,
+        null,
+        { email }
+      );
     }
     if (user_name) {
-      logger.error("User Name already Exisit");
-      return res.status(400).json({ message: "User Name already Exisit" });
+      logger.error("User Name already Exists");
+      return sendResponse(res, "fail", "User Name already Exists", null, null, {
+        username,
+      });
     }
 
-    // Check if user's role is provided
     if (!role) {
       logger.error("Role is mandatory");
-      return res.status(400).json({ message: "Role is mandatory" });
+      return sendResponse(res, "fail", "Role is mandatory");
     }
 
-    // Update user details
     user = await User.create({
       username,
       role,
@@ -38,19 +44,18 @@ exports.register = async (req, res) => {
       is_active: true,
     });
 
-    // Serialize user instance to JSON and remove sensitive fields
     const userJSON = user.toJSON();
     delete userJSON.password;
     delete userJSON.verified_otp;
     delete userJSON.forgot_otp;
 
     logger.info(`User with email ${email} registered successfully`);
-    res
-      .status(201)
-      .json({ message: "User registered successfully", user: userJSON });
+    sendResponse(res, "success", "User registered successfully", {
+      user: userJSON,
+    });
   } catch (error) {
     logger.error(`Register error: ${error.message}`);
-    res.status(500).json({ message: "Server error", error: error.message });
+    sendResponse(res, "fail", "Server error", null, error.message);
   }
 };
 
@@ -61,7 +66,7 @@ exports.login = async (req, res) => {
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       logger.error("Invalid credentials");
-      return res.status(401).json({ message: "Invalid credentials" });
+      return sendResponse(res, "fail", "Invalid credentials");
     }
 
     const token = jwt.sign(
@@ -71,10 +76,10 @@ exports.login = async (req, res) => {
     );
 
     logger.info(`User with email ${email} logged in successfully`);
-    res.status(200).json({ message: "Login successful", token });
+    sendResponse(res, "success", "Login successful", { token });
   } catch (error) {
     logger.error(`Login error: ${error.message}`);
-    res.status(500).json({ message: "Server error", error: error.message });
+    sendResponse(res, "fail", "Server error", null, error.message);
   }
 };
 
@@ -84,19 +89,21 @@ exports.changePassword = async (req, res) => {
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return sendResponse(res, "fail", "User not found", null, null, {
+        userId: req.params.id,
+      });
     }
 
     if (!(await bcrypt.compare(currentPassword, user.password))) {
-      return res.status(400).json({ message: "Invalid current password" });
+      return sendResponse(res, "fail", "Invalid current password");
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
-    res.status(200).json({ message: "Password changed successfully" });
+    sendResponse(res, "success", "Password changed successfully");
   } catch (error) {
     logger.error(`Change Password error: ${error.message}`);
-    res.status(500).json({ message: "Server error", error: error.message });
+    sendResponse(res, "fail", "Server error", null, error.message);
   }
 };

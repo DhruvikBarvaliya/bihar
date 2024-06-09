@@ -41,7 +41,7 @@ const createDefaultUser = async (userData) => {
     });
     setTimeout(function () {
       logger.info(
-        `>>> ROLE:- ${userData.role}, EMAIL:-${userData.email}, PASSWORD:-${userData.password} created successfully. <<<`,
+        `>>> ROLE:- ${userData.role}, EMAIL:-${userData.email}, PASSWORD:-${userData.password} created successfully. <<<`
       );
     }, 2000);
   } catch (error) {
@@ -50,7 +50,7 @@ const createDefaultUser = async (userData) => {
 };
 
 sequelize
-  .sync({ force: false, alter: true })
+  .sync({ force: true, alter: true })
   .then(async () => {
     logger.info("Drop and re-sync db.");
     let storeData;
@@ -122,6 +122,6 @@ const serverUrl =
 
 app.listen(port, () =>
   logger.info(
-    `Server is Running on ${serverUrl} and Swagger is Running on ${serverUrl}/api-docs/`,
-  ),
+    `Server is Running on ${serverUrl} and Swagger is Running on ${serverUrl}/api-docs/`
+  )
 );

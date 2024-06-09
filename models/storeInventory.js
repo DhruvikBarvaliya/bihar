@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "store_inventory",
       timestamps: true,
       underscored: true,
-    },
+    }
   );
 
   return StoreInventory;

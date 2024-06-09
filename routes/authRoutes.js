@@ -69,7 +69,7 @@ router.post(
   "/auth/register",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
-  authController.register,
+  authController.register
 );
 
 /**

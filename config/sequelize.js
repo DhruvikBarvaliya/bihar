@@ -9,7 +9,7 @@ const sequelize = new Sequelize(
     dialect: config.dialect,
     pool: config.pool,
     logging: false,
-  },
+  }
 );
 
 const User = require("../models/user")(sequelize, Sequelize);
@@ -17,7 +17,7 @@ const Store = require("../models/store")(sequelize, Sequelize);
 const Inventory = require("../models/inventory")(sequelize, Sequelize);
 const StoreInventory = require("../models/storeInventory")(
   sequelize,
-  Sequelize,
+  Sequelize
 );
 
 // Relationships

@@ -5,13 +5,14 @@ const sendResponse = require("../utils/responseHelper");
 
 exports.createInventory = async (req, res) => {
   try {
-    const { item_name, quantity, is_available,  description,store_id } = req.body;
+    const { item_name, quantity, is_available, description, store_id } =
+      req.body;
     const inventory = await Inventory.create({
       item_name,
       quantity,
       is_available,
       description,
-      store_id
+      store_id,
     });
     logger.info("Inventory created: ", JSON.stringify(inventory));
     sendResponse(res, "success", "Inventory created successfully", {
@@ -56,6 +57,7 @@ exports.searchInventory = async (req, res) => {
   try {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
+    console.log("keyword", keyword);
     const { count, rows } = await Inventory.findAndCountAll({
       where: {
         item_name: {
@@ -115,7 +117,8 @@ exports.getInventoryById = async (req, res) => {
 exports.updateInventory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { item_name, quantity, is_available,  description,store_id } = req.body;
+    const { item_name, quantity, is_available, description, store_id } =
+      req.body;
     const inventory = await Inventory.findByPk(id);
     if (!inventory) {
       logger.error("Inventory not found");
@@ -128,7 +131,7 @@ exports.updateInventory = async (req, res) => {
         quantity,
         is_available,
         description,
-        store_id
+        store_id,
       });
       logger.info("Inventory updated: ", JSON.stringify(updatedInventory));
       sendResponse(res, "success", "Inventory updated successfully", {

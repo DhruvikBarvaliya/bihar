@@ -1,6 +1,7 @@
 const { User } = require("../config/sequelize");
 const logger = require("../middlewares/logger");
 const { Op } = require("sequelize");
+const sendResponse = require("../utils/responseHelper");
 
 exports.getUserProfile = async (req, res) => {
   try {
@@ -8,19 +9,22 @@ exports.getUserProfile = async (req, res) => {
 
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
-      return res.status(404).json({ message: "User not found" });
+      return sendResponse(res, "fail", "User not found", null, null, {
+        userId: req.params.id,
+      });
     }
 
-    // Convert user to JSON and remove password field
     const userProfile = user.toJSON();
     delete userProfile.password;
     delete userProfile.verified_otp;
     delete userProfile.forgot_otp;
 
-    res.status(200).json(userProfile);
+    sendResponse(res, "success", "User profile retrieved successfully", {
+      userProfile,
+    });
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(res, "fail", "Server error", null, error.message);
   }
 };
 
@@ -30,13 +34,13 @@ exports.updateUserProfile = async (req, res) => {
     const user = await User.findByPk(req.params.id);
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
-      return res.status(404).json({ message: "User not found" });
+      return sendResponse(res, "fail", "User not found", null, null, {
+        userId: req.params.id,
+      });
     }
 
     user.username = username || user.username;
     user.role = role || user.role;
-    // await User.update(req.body, { where: { id: req.params.id } });
-
     await user.save();
 
     const userProfile = user.toJSON();
@@ -45,10 +49,12 @@ exports.updateUserProfile = async (req, res) => {
     delete userProfile.forgot_otp;
 
     logger.info(`User profile updated for ID ${req.params.id}`);
-    res.status(200).json(userProfile);
+    sendResponse(res, "success", "User profile updated successfully", {
+      userProfile,
+    });
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(res, "fail", "Server error", null, error.message);
   }
 };
 
@@ -62,7 +68,6 @@ exports.listUsers = async (req, res) => {
     });
     const totalPages = Math.ceil(users.count / limit);
 
-    // Convert each user to JSON and remove password field
     const userList = users.rows.map((user) => {
       const userJSON = user.toJSON();
       delete userJSON.password;
@@ -72,8 +77,7 @@ exports.listUsers = async (req, res) => {
     });
 
     logger.info(`Users listed, page ${page}`);
-
-    res.status(200).json({
+    sendResponse(res, "success", "Users listed successfully", {
       totalItems: users.count,
       totalPages,
       currentPage: parseInt(page),
@@ -81,7 +85,7 @@ exports.listUsers = async (req, res) => {
     });
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(res, "fail", "Server error", null, error.message);
   }
 };
 
@@ -90,15 +94,17 @@ exports.deleteUser = async (req, res) => {
     const user = await User.findByPk(req.params.id);
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
-      return res.status(404).json({ message: "User not found" });
+      return sendResponse(res, "fail", "User not found", null, null, {
+        userId: req.params.id,
+      });
     }
 
     await user.destroy();
     logger.info(`User with ID ${req.params.id} deleted`);
-    res.status(200).json({ message: "User deleted successfully" });
+    sendResponse(res, "success", "User deleted successfully");
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(res, "fail", "Server error", null, error.message);
   }
 };
 
@@ -119,7 +125,6 @@ exports.searchUsers = async (req, res) => {
     const totalPages = Math.ceil(users.count / limit);
     logger.info(`Users searched with keyword "${keyword}", page ${page}`);
 
-    // Convert each user to JSON and remove password field
     const userList = users.rows.map((user) => {
       const userJSON = user.toJSON();
       delete userJSON.password;
@@ -128,7 +133,7 @@ exports.searchUsers = async (req, res) => {
       return userJSON;
     });
 
-    res.status(200).json({
+    sendResponse(res, "success", "Users searched successfully", {
       totalItems: users.count,
       totalPages,
       currentPage: parseInt(page),
@@ -136,6 +141,6 @@ exports.searchUsers = async (req, res) => {
     });
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(res, "fail", "Server error", null, error.message);
   }
 };

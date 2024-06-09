@@ -83,7 +83,7 @@ router.get(
   "/users",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
-  userController.listUsers,
+  userController.listUsers
 );
 
 /**
@@ -118,7 +118,7 @@ router.get(
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
   authenticate,
-  userController.searchUsers,
+  userController.searchUsers
 );
 
 /**

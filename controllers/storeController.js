@@ -1,9 +1,20 @@
+const { validationResult } = require("express-validator");
 const { Store } = require("../config/sequelize");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
-
 exports.createStore = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return sendResponse(
+        res,
+        "fail",
+        "Validation error",
+        null,
+        errors.array()
+      );
+    }
+
     const store = await Store.create(req.body);
     logger.info(`Store created with ID: ${store.id}`);
     sendResponse(res, "success", "Store created successfully", { store });
@@ -56,6 +67,17 @@ exports.getStoreById = async (req, res) => {
 
 exports.updateStore = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return sendResponse(
+        res,
+        "fail",
+        "Validation error",
+        null,
+        errors.array()
+      );
+    }
+
     const [updated] = await Store.update(req.body, {
       where: { id: req.params.id },
     });

@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
           "EEE",
           "ESE",
           "CE",
-          "STORE_IN_CHARGE",
+          "STORE_IN_CHARGE"
         ),
       },
       username: {
@@ -60,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "users",
       timestamps: true,
       underscored: true,
-    },
+    }
   );
 
   return User;

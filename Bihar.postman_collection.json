@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "db0d3101-8436-476f-92e4-11a43deb5529",
-		"name": "Bihar New",
+		"_postman_id": "c0b378d2-7eab-4cac-8efa-6d8b3718e424",
+		"name": "Bihar V1",
 		"description": "API Collection for Material Requisition System",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "19223942"
@@ -11,8 +11,18 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Send OTP",
+					"name": "Register",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -22,34 +32,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"2018echev031@ldce.ac.in\",\n    \"type\": \"verify\" //\"forgot\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/send-otp-email",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"auth",
-								"send-otp-email"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Register",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"Password123!\",\n  \"email\": \"2018echev031@ldce.ac.in\",\n  \"role\": \"JE\",\n  \"verified_otp\": 497331\n}"
+							"raw": "{\n    \"role\": \"JE\",\n    \"username\": \"aaa\",\n    \"email\": \"aaa@gmail.com\",\n    \"password\": \"aaa\",\n    \"store_id\": \"c5765279-913d-440a-a3cd-2e8b1b82f0f3\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
@@ -72,7 +55,7 @@
 							"script": {
 								"exec": [
 									"const response = pm.response.json()\r",
-									"pm.environment.set(\"token\", response.token);"
+									"pm.environment.set(\"token\", response.data.token);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -105,33 +88,6 @@
 					"response": []
 				},
 				{
-					"name": "Forgot Password",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"2018echev031@ldce.ac.in\",\n    \"otp\": 143256,\n    \"newPassword\": \"asd123\",\n    \"confirmPassword\": \"asd123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/forgot-password",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"auth",
-								"forgot-password"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Change Password",
 					"request": {
 						"method": "POST",
@@ -146,14 +102,20 @@
 							"raw": "{\n  \"currentPassword\": \"Password123!\",\n  \"newPassword\": \"NewPassword123!\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/auth/change-password/406d158b-2b9b-4069-a198-d31bd4b6ecfc",
+							"raw": "{{base_url}}/auth/change-password/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"auth",
 								"change-password",
-								"406d158b-2b9b-4069-a198-d31bd4b6ecfc"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
 							]
 						}
 					},
@@ -162,10 +124,10 @@
 			]
 		},
 		{
-			"name": "Inventory",
+			"name": "Store",
 			"item": [
 				{
-					"name": "Create Inventory",
+					"name": "Create Store",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -180,29 +142,32 @@
 						"method": "POST",
 						"header": [
 							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							},
+							{
 								"key": "Content-Type",
 								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"item_name\": \"Sample Item\",\r\n    \"quantity\": 10,\r\n    \"is_available\": true,\r\n    \"unit\": 1,\r\n    \"description\": \"Sample description\"\r\n}"
+							"raw": "{\n    \"name\": \"Store 1\",\n    \"code\": \"Store 1\",\n    \"description\": \"A sample store 1\",\n    \"location\": \"Location 1\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/inventory/create",
+							"raw": "{{base_url}}/store",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"inventory",
-								"create"
+								"store"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get All Inventory",
+					"name": "Get All Stores",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -215,14 +180,19 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/inventory?page=1&limit=10",
+							"raw": "{{base_url}}/store?page=1&limit=10",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"inventory"
+								"store"
 							],
 							"query": [
 								{
@@ -239,7 +209,7 @@
 					"response": []
 				},
 				{
-					"name": "Search Inventory",
+					"name": "Get Store By ID",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -252,62 +222,25 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/inventory/search?keyword=e&page=1&limit=10",
+							"raw": "{{base_url}}/store/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"inventory",
-								"search"
-							],
-							"query": [
-								{
-									"key": "keyword",
-									"value": "e"
-								},
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Inventory By ID",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/inventory/:id",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"inventory",
+								"store",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "1"
+									"value": "a70edb7c-9908-4ee3-9165-8bd7eaf8a5f4"
 								}
 							]
 						}
@@ -315,7 +248,7 @@
 					"response": []
 				},
 				{
-					"name": "Update Inventory",
+					"name": "Update Store",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -330,28 +263,31 @@
 						"method": "PUT",
 						"header": [
 							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							},
+							{
 								"key": "Content-Type",
 								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"item_name\": \"Updated Item\",\r\n    \"quantity\": 15,\r\n    \"is_available\": false,\r\n    \"unit\": 2,\r\n    \"description\": \"Updated description\"\r\n}"
+							"raw": "{\n    \"name\": \"Store 2\",\n    \"code\": \"Store 2\",\n    \"description\": \"A sample store 2\",\n    \"location\": \"Location 2\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/inventory/update/:id",
+							"raw": "{{base_url}}/store/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"inventory",
-								"update",
+								"store",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "1"
+									"value": "a70edb7c-9908-4ee3-9165-8bd7eaf8a5f4"
 								}
 							]
 						}
@@ -359,7 +295,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete Inventory",
+					"name": "Delete Store",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -372,21 +308,25 @@
 							]
 						},
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <your_token>"
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/inventory/delete/:id",
+							"raw": "{{base_url}}/store/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"inventory",
-								"delete",
+								"store",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "1"
+									"value": "a70edb7c-9908-4ee3-9165-8bd7eaf8a5f4"
 								}
 							]
 						}
@@ -414,7 +354,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users?page=1&limit=2",
+							"raw": "{{base_url}}/users?page=1&limit=10",
 							"host": [
 								"{{base_url}}"
 							],
@@ -428,7 +368,7 @@
 								},
 								{
 									"key": "limit",
-									"value": "2"
+									"value": "10"
 								}
 							]
 						}
@@ -538,7 +478,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"janedoe\",\n    \"role\": \"ADMIN\"\n}"
+							"raw": "{\n    \"username\": \"bbb\",\n    \"role\": \"ADMIN\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/users/:id",
@@ -552,7 +492,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "6a0200fe-544e-4334-a78a-8cffd933aae4"
+									"value": "00e8b2af-200e-46d0-b5dc-32a3edfaffa7"
 								}
 							]
 						}
@@ -586,7 +526,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "6a0200fe-544e-4334-a78a-8cffd933aae4"
+									"value": "00e8b2af-200e-46d0-b5dc-32a3edfaffa7"
 								}
 							]
 						}
@@ -596,10 +536,10 @@
 			]
 		},
 		{
-			"name": "Store",
+			"name": "Inventory",
 			"item": [
 				{
-					"name": "Create Store",
+					"name": "Create Inventory",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -614,33 +554,28 @@
 						"method": "POST",
 						"header": [
 							{
-								"key": "Authorization",
-								"value": "Bearer <your_token>"
-							},
-							{
 								"key": "Content-Type",
 								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Store 1\",\n    \"description\": \"A sample store\",\n    \"location\": \"Location 1\"\n}"
+							"raw": "{\r\n    \"item_name\": \"Sample Item\",\r\n    \"quantity\": 10,\r\n    \"is_available\": true,\r\n    \"description\": \"Sample description\",\r\n    \"store_id\": \"c5765279-913d-440a-a3cd-2e8b1b82f0f3\"\r\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/store/create",
+							"raw": "{{base_url}}/inventory",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"store",
-								"create"
+								"inventory"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get All Stores",
+					"name": "Get All Inventory",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -653,19 +588,14 @@
 							]
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer <your_token>"
-							}
-						],
+						"header": [],
 						"url": {
-							"raw": "{{base_url}}/stores?page=1&limit=10",
+							"raw": "{{base_url}}/inventory?page=1&limit=10",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"stores"
+								"inventory"
 							],
 							"query": [
 								{
@@ -682,7 +612,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Store By ID",
+					"name": "Search Inventory",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -695,25 +625,28 @@
 							]
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer <your_token>"
-							}
-						],
+						"header": [],
 						"url": {
-							"raw": "{{base_url}}/stores/:id",
+							"raw": "{{base_url}}/inventory/search?keyword=Sample&page=1&limit=10",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"stores",
-								":id"
+								"inventory",
+								"search"
 							],
-							"variable": [
+							"query": [
 								{
-									"key": "id",
-									"value": ""
+									"key": "keyword",
+									"value": "Sample"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
 								}
 							]
 						}
@@ -721,7 +654,41 @@
 					"response": []
 				},
 				{
-					"name": "Update Store",
+					"name": "Get Inventory By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/inventory/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventory",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "f2eb5a2c-c522-4a0a-b47e-d8af885a2c22"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Inventory",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -736,32 +703,27 @@
 						"method": "PUT",
 						"header": [
 							{
-								"key": "Authorization",
-								"value": "Bearer <your_token>"
-							},
-							{
 								"key": "Content-Type",
 								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Updated Store 1\",\n  \"description\": \"An updated sample store\",\n  \"location\": \"Updated Location 1\"\n}"
+							"raw": "{\r\n    \"item_name\": \"Sample Item 2\",\r\n    \"quantity\": 20,\r\n    \"is_available\": true,\r\n    \"description\": \"Sample description\",\r\n    \"store_id\": \"d45bbfbe-aa35-4e87-b119-649c9ff05582\"\r\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/store/update/:id",
+							"raw": "{{base_url}}/inventory/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"store",
-								"update",
+								"inventory",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": ""
+									"value": "f2eb5a2c-c522-4a0a-b47e-d8af885a2c22"
 								}
 							]
 						}
@@ -769,7 +731,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete Store",
+					"name": "Delete Inventory",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -782,192 +744,21 @@
 							]
 						},
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer <your_token>"
-							}
-						],
+						"header": [],
 						"url": {
-							"raw": "{{base_url}}/store/delete/:id",
+							"raw": "{{base_url}}/inventory/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"store",
-								"delete",
+								"inventory",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": ""
+									"value": "f2eb5a2c-c522-4a0a-b47e-d8af885a2c22"
 								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Requisition",
-			"item": [
-				{
-					"name": "Submit Requisition",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"item_name\": \"Item 1\",\n    \"quantity\": 10,\n    \"purpose\": \"Office Use\",\n    \"required_date\": \"2024-06-15\",\n    \"description\": \"Sample item description\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/requisitions",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"requisitions"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Requisition Status",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/requisitions/:id/status",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"requisitions",
-								":id",
-								"status"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Approve Requisition",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"status\": \"Approved\",\n    \"notes\": \"Approved for purchase\",\n    \"comments\": \"All good\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/requisitions/:id/approve",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"requisitions",
-								":id",
-								"approve"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List All Requisitions",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/requisitions",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"requisitions"
 							]
 						}
 					},
