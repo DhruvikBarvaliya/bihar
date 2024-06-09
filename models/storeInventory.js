@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   const StoreInventory = sequelize.define(
     "StoreInventory",
     {
-      storeId: {
+      store_id: {
         type: DataTypes.UUID,
         references: {
           model: "stores",
@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         primaryKey: true,
       },
-      productId: {
+      inventory_id: {
         type: DataTypes.UUID,
         references: {
           model: "inventories",

@@ -1,22 +1,25 @@
 const { Inventory } = require("../config/sequelize");
 const { Op } = require("sequelize");
 const logger = require("../middlewares/logger");
+const sendResponse = require("../utils/responseHelper");
 
 exports.createInventory = async (req, res) => {
   try {
-    const { item_name, quantity, is_available, unit, description } = req.body;
+    const { item_name, quantity, is_available,  description,store_id } = req.body;
     const inventory = await Inventory.create({
       item_name,
       quantity,
       is_available,
-      unit,
       description,
+      store_id
     });
     logger.info("Inventory created: ", JSON.stringify(inventory));
-    res.status(201).json(inventory);
+    sendResponse(res, "success", "Inventory created successfully", {
+      inventory,
+    });
   } catch (error) {
     logger.error("Error creating inventory: ", JSON.stringify(error));
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(res, "fail", "Error creating inventory", null, error.message);
   }
 };
 
@@ -29,16 +32,23 @@ exports.getAllInventory = async (req, res) => {
       limit,
     });
     const totalPages = Math.ceil(count / limit);
-    logger.info("All inventory retrieved");
-    res.status(200).json({
+    const response = {
       totalItems: count,
       totalPages,
       currentPage: parseInt(page),
       inventory: rows,
-    });
+    };
+    logger.info("All inventory retrieved");
+    sendResponse(res, "success", "Inventory retrieved successfully", response);
   } catch (error) {
     logger.error("Error retrieving all inventory: ", JSON.stringify(error));
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(
+      res,
+      "fail",
+      "Error retrieving inventory",
+      null,
+      error.message
+    );
   }
 };
 
@@ -46,7 +56,7 @@ exports.searchInventory = async (req, res) => {
   try {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    const inventory = await Inventory.findAndCountAll({
+    const { count, rows } = await Inventory.findAndCountAll({
       where: {
         item_name: {
           [Op.like]: `%${keyword}%`,
@@ -55,17 +65,23 @@ exports.searchInventory = async (req, res) => {
       offset,
       limit,
     });
-    const totalPages = Math.ceil(inventory.count / limit);
-    logger.info("Inventory search completed");
-    res.status(200).json({
-      totalItems: inventory.count,
+    const totalPages = Math.ceil(count / limit);
+    const response = {
+      totalItems: count,
       totalPages,
       currentPage: parseInt(page),
-      inventory: inventory.rows,
-    });
+      inventory: rows,
+    };
+    logger.info("Inventory search completed");
+    sendResponse(
+      res,
+      "success",
+      "Inventory search completed successfully",
+      response
+    );
   } catch (error) {
     logger.error("Error searching inventory: ", JSON.stringify(error));
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(res, "fail", "Error searching inventory", null, error.message);
   }
 };
 
@@ -75,53 +91,72 @@ exports.getInventoryById = async (req, res) => {
     const inventory = await Inventory.findByPk(id);
     if (!inventory) {
       logger.error("Inventory not found");
-      return res.status(404).json({ message: "Inventory not found" });
+      sendResponse(res, "fail", "Inventory not found", null, null, {
+        inventoryId: id,
+      });
+    } else {
+      logger.info("Inventory retrieved by ID: ", JSON.stringify(inventory));
+      sendResponse(res, "success", "Inventory retrieved successfully", {
+        inventory,
+      });
     }
-    logger.info("Inventory retrieved by ID: ", JSON.stringify(inventory));
-    res.status(200).json(inventory);
   } catch (error) {
     logger.error("Error retrieving inventory by ID: ", JSON.stringify(error));
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(
+      res,
+      "fail",
+      "Error retrieving inventory",
+      null,
+      error.message
+    );
   }
 };
 
 exports.updateInventory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { item_name, quantity, is_available, unit, description } = req.body;
+    const { item_name, quantity, is_available,  description,store_id } = req.body;
     const inventory = await Inventory.findByPk(id);
     if (!inventory) {
       logger.error("Inventory not found");
-      return res.status(404).json({ message: "Inventory not found" });
+      sendResponse(res, "fail", "Inventory not found", null, null, {
+        inventoryId: id,
+      });
+    } else {
+      const updatedInventory = await inventory.update({
+        item_name,
+        quantity,
+        is_available,
+        description,
+        store_id
+      });
+      logger.info("Inventory updated: ", JSON.stringify(updatedInventory));
+      sendResponse(res, "success", "Inventory updated successfully", {
+        updatedInventory,
+      });
     }
-    const updatedInventory = await inventory.update({
-      item_name,
-      quantity,
-      is_available,
-      unit,
-      description,
-    });
-    logger.info("Inventory updated: ", JSON.stringify(updatedInventory));
-    res.status(200).json(updatedInventory);
   } catch (error) {
     logger.error("Error updating inventory: ", JSON.stringify(error));
-    res.status(500).json({ message: "Server error", error });
+    sendResponse(res, "fail", "Error updating inventory", null, error.message);
   }
 };
 
 exports.deleteInventory = async (req, res) => {
   try {
-    const { id } = req.params;
-    const inventory = await Inventory.findByPk(id);
-    if (!inventory) {
-      logger.error("Inventory not found");
-      return res.status(404).json({ message: "Inventory not found" });
+    const deleted = await Inventory.destroy({
+      where: { id: req.params.id },
+    });
+    if (deleted) {
+      logger.info(`Deleted Inventory with ID: ${req.params.id}`);
+      sendResponse(res, "success", "Inventory deleted successfully");
+    } else {
+      logger.warn(`Inventory not found with ID: ${req.params.id}`);
+      sendResponse(res, "fail", "Inventory not found", null, null, {
+        inventoryId: req.params.id,
+      });
     }
-    await inventory.destroy();
-    logger.info("Inventory deleted");
-    res.status(204).end();
   } catch (error) {
-    logger.error("Error deleting inventory: ", JSON.stringify(error));
-    res.status(500).json({ message: "Server error", error });
+    logger.error(`Error deleting Inventory: ${error.message}`);
+    sendResponse(res, "fail", "Error deleting inventory", null, error.message);
   }
 };

@@ -22,26 +22,26 @@ const StoreInventory = require("../models/storeInventory")(
 
 // Relationships
 Store.hasMany(User, {
-  foreignKey: "storeId",
+  foreignKey: "store_id",
   as: "users",
 });
 
 User.belongsTo(Store, {
-  foreignKey: "storeId",
+  foreignKey: "store_id",
   as: "store",
 });
 
 Store.belongsToMany(Inventory, {
   through: StoreInventory,
-  foreignKey: "storeId",
-  otherKey: "inventoryId",
+  foreignKey: "store_id",
+  otherKey: "inventory_id",
   as: "Inventory",
 });
 
 Inventory.belongsToMany(Store, {
   through: StoreInventory,
-  foreignKey: "inventoryId",
-  otherKey: "storeId",
+  foreignKey: "inventory_id",
+  otherKey: "store_id",
   as: "stores",
 });
 

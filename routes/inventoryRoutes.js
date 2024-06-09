@@ -67,7 +67,7 @@ const authorize = require("../middlewares/authorize");
  *         description: Server error
  */
 router.post(
-  "/inventory/create",
+  "/inventory",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
   inventoryController.createInventory,
@@ -232,7 +232,7 @@ router.get(
  *         description: Server error
  */
 router.put(
-  "/inventory/update/:id",
+  "/inventory/:id",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
   inventoryController.updateInventory,
@@ -261,7 +261,7 @@ router.put(
  *         description: Server error
  */
 router.delete(
-  "/inventory/delete/:id",
+  "/inventory/:id",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
   inventoryController.deleteInventory,

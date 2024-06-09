@@ -1,14 +1,15 @@
 const { Store } = require("../config/sequelize");
 const logger = require("../middlewares/logger");
+const sendResponse = require("../utils/responseHelper");
 
 exports.createStore = async (req, res) => {
   try {
     const store = await Store.create(req.body);
     logger.info(`Store created with ID: ${store.id}`);
-    res.status(201).json(store);
+    sendResponse(res, "success", "Store created successfully", { store });
   } catch (error) {
     logger.error(`Error creating store: ${error.message}`);
-    res.status(400).json({ error: error.message });
+    sendResponse(res, "fail", "Error creating store", null, error.message);
   }
 };
 
@@ -28,10 +29,10 @@ exports.getAllStore = async (req, res) => {
       stores: stores.rows,
     };
     logger.info(`Retrieved ${stores.rows.length} stores`);
-    res.json(response);
+    sendResponse(res, "success", "Stores retrieved successfully", response);
   } catch (error) {
     logger.error(`Error retrieving stores: ${error.message}`);
-    res.status(500).json({ error: error.message });
+    sendResponse(res, "fail", "Error retrieving stores", null, error.message);
   }
 };
 
@@ -40,14 +41,16 @@ exports.getStoreById = async (req, res) => {
     const store = await Store.findByPk(req.params.id);
     if (!store) {
       logger.warn(`Store not found with ID: ${req.params.id}`);
-      res.status(404).json({ error: "Store not found" });
+      sendResponse(res, "fail", "Store not found", null, null, {
+        storeId: req.params.id,
+      });
     } else {
       logger.info(`Retrieved store with ID: ${store.id}`);
-      res.json(store);
+      sendResponse(res, "success", "Store retrieved successfully", { store });
     }
   } catch (error) {
     logger.error(`Error retrieving store by ID: ${error.message}`);
-    res.status(500).json({ error: error.message });
+    sendResponse(res, "fail", "Error retrieving store", null, error.message);
   }
 };
 
@@ -59,14 +62,18 @@ exports.updateStore = async (req, res) => {
     if (updated) {
       const updatedStore = await Store.findByPk(req.params.id);
       logger.info(`Updated store with ID: ${updatedStore.id}`);
-      res.json(updatedStore);
+      sendResponse(res, "success", "Store updated successfully", {
+        updatedStore,
+      });
     } else {
       logger.warn(`Store not found with ID: ${req.params.id}`);
-      res.status(404).json({ error: "Store not found" });
+      sendResponse(res, "fail", "Store not found", null, null, {
+        storeId: req.params.id,
+      });
     }
   } catch (error) {
     logger.error(`Error updating store: ${error.message}`);
-    res.status(400).json({ error: error.message });
+    sendResponse(res, "fail", "Error updating store", null, error.message);
   }
 };
 
@@ -77,13 +84,15 @@ exports.deleteStore = async (req, res) => {
     });
     if (deleted) {
       logger.info(`Deleted store with ID: ${req.params.id}`);
-      res.status(204).send();
+      sendResponse(res, "success", "Store deleted successfully");
     } else {
       logger.warn(`Store not found with ID: ${req.params.id}`);
-      res.status(404).json({ error: "Store not found" });
+      sendResponse(res, "fail", "Store not found", null, null, {
+        storeId: req.params.id,
+      });
     }
   } catch (error) {
     logger.error(`Error deleting store: ${error.message}`);
-    res.status(500).json({ error: error.message });
+    sendResponse(res, "fail", "Error deleting store", null, error.message);
   }
 };

@@ -49,7 +49,7 @@ const authorize = require("../middlewares/authorize");
  *               items:
  *                 $ref: '#/components/schemas/Store'
  */
-router.get("/", authenticate, storeController.getAllStore);
+router.get("/store", authenticate, storeController.getAllStore);
 
 /**
  * @swagger
@@ -74,7 +74,7 @@ router.get("/", authenticate, storeController.getAllStore);
  *       404:
  *         description: Store not found
  */
-router.get("/:id", authenticate, storeController.getStoreById);
+router.get("/store/:id", authenticate, storeController.getStoreById);
 
 /**
  * @swagger
@@ -99,7 +99,7 @@ router.get("/:id", authenticate, storeController.getStoreById);
  *         description: Invalid input
  */
 router.post(
-  "/",
+  "/store",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
   storeController.createStore,
@@ -137,7 +137,7 @@ router.post(
  *         description: Store not found
  */
 router.put(
-  "/:id",
+  "/store/:id",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
   storeController.updateStore,
@@ -163,7 +163,7 @@ router.put(
  *         description: Store not found
  */
 router.delete(
-  "/:id",
+  "/store/:id",
   authenticate,
   authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
   storeController.deleteStore,

@@ -2,20 +2,24 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { User } = require("../config/sequelize");
 const config = require("../config/config");
-const { sendEmail } = require("../utils/emailSender");
 const logger = require("../middlewares/logger");
 
 exports.register = async (req, res) => {
   try {
-    const { username, password, email, role } = req.body;
+    const { username, role, email, password, store_id } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     let user = await User.findOne({ where: { email } });
+    let user_name = await User.findOne({ where: { username } });
 
     if (user) {
-      logger.error("user already registered with this email");
+      logger.error("User Already Registered with this Email");
       return res
         .status(400)
-        .json({ message: "user already registered with this email" });
+        .json({ message: "User Already Registered with this Email" });
+    }
+    if (user_name) {
+      logger.error("User Name already Exisit");
+      return res.status(400).json({ message: "User Name already Exisit" });
     }
 
     // Check if user's role is provided
@@ -25,13 +29,14 @@ exports.register = async (req, res) => {
     }
 
     // Update user details
-    user.email = email || user.email;
-    user.username = username;
-    user.role = role;
-    user.password = hashedPassword;
-    user.is_active = true;
-
-    user = await user.save();
+    user = await User.create({
+      username,
+      role,
+      email,
+      password: hashedPassword,
+      store_id,
+      is_active: true,
+    });
 
     // Serialize user instance to JSON and remove sensitive fields
     const userJSON = user.toJSON();
@@ -62,7 +67,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role },
       config.JWT_SECRET,
-      { expiresIn: "1h" },
+      { expiresIn: "12h" }
     );
 
     logger.info(`User with email ${email} logged in successfully`);

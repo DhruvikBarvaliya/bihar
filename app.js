@@ -50,7 +50,7 @@ const createDefaultUser = async (userData) => {
 };
 
 sequelize
-  .sync({ force: true, alter: true })
+  .sync({ force: false, alter: true })
   .then(async () => {
     logger.info("Drop and re-sync db.");
     let storeData;
@@ -78,7 +78,7 @@ sequelize
         role: "SUPER_ADMIN",
         is_active: true,
         is_verified: true,
-        storeId: store_data_id, // Correct foreign key field
+        store_id: store_data_id, // Store foreign key field
       };
       const superAdminUser = await User.findOne({
         where: {
@@ -97,7 +97,7 @@ sequelize
         role: "ADMIN",
         is_active: true,
         is_verified: true,
-        storeId: store_data_id, // Correct foreign key field
+        store_id: store_data_id, // Store foreign key field
       };
 
       const adminUser = await User.findOne({

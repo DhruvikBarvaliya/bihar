@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
       forgot_otp: {
         type: INTEGER,
       },
-      storeId: {
+      store_id: {
         type: UUID,
         references: {
           model: "stores",
