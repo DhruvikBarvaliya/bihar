@@ -78,7 +78,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role },
       config.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     logger.info(`User with email ${email} logged in successfully`);
@@ -111,7 +111,7 @@ exports.sendOtp = async (req, res) => {
       }
       await sendEmail(email, "Verified User OTP", `Your OTP is ${otp}`);
       logger.info(
-        `OTP Sent successfully for verified user with email ${email}`
+        `OTP Sent successfully for verified user with email ${email}`,
       );
       res
         .status(200)
@@ -122,7 +122,7 @@ exports.sendOtp = async (req, res) => {
       await user.save();
       await sendEmail(email, "Forgot Password OTP", `Your OTP is ${otp}`);
       logger.info(
-        `OTP sent successfully for forgot password to user with email ${email}`
+        `OTP sent successfully for forgot password to user with email ${email}`,
       );
       res
         .status(200)
