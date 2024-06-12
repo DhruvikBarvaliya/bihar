@@ -62,7 +62,7 @@ const authorize = require("../middlewares/authorize");
 router.post(
   "/inventory",
   authenticate,
-  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authorize(["Super Admin", "Admin", "CE"]),
   validateInventory,
   inventoryController.createInventory
 );
@@ -198,7 +198,7 @@ router.get("/inventory/store/:store_id", inventoryController.getInventoryByStore
 router.put(
   "/inventory/:id",
   authenticate,
-  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authorize(["Super Admin", "Admin", "CE"]),
   validateInventory,
   inventoryController.updateInventory
 );
@@ -226,7 +226,7 @@ router.put(
 router.delete(
   "/inventory/:id",
   authenticate,
-  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authorize(["Super Admin", "Admin", "CE"]),
   inventoryController.deleteInventory
 );
 

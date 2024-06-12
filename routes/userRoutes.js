@@ -22,7 +22,7 @@ const authorize = require("../middlewares/authorize");
  *           type: string
  *         role:
  *           type: string
- *           enum: [SUPER_ADMIN, ADMIN, JE, AEE, EEE, ESE, CE, STORE_IN_CHARGE]
+ *           enum: [Super Admin, Admin, JE, AEE, EEE, ESE, CE, Store In Charge]
  *         username:
  *           type: string
  *         email:
@@ -82,7 +82,7 @@ const authorize = require("../middlewares/authorize");
 router.get(
   "/users",
   authenticate,
-  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authorize(["Super Admin", "Admin", "CE"]),
   userController.listUsers
 );
 
@@ -116,7 +116,7 @@ router.get(
 router.get(
   "/users/search",
   authenticate,
-  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authorize(["Super Admin", "Admin", "CE"]),
   authenticate,
   userController.searchUsers
 );

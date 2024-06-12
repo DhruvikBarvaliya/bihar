@@ -478,7 +478,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"bbb\",\n    \"role\": \"ADMIN\"\n}"
+							"raw": "{\n    \"username\": \"bbb\",\n    \"role\": \"Admin\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/users/:id",

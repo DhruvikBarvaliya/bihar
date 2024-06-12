@@ -103,7 +103,7 @@ router.get("/store/:id", authenticate, storeController.getStoreById);
 router.post(
   "/store",
   authenticate,
-  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authorize(["Super Admin", "Admin", "CE"]),
   [
     body("name").notEmpty().withMessage("Name is required"),
     body("location").notEmpty().withMessage("Location is required"),
@@ -145,7 +145,7 @@ router.post(
 router.put(
   "/store/:id",
   authenticate,
-  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authorize(["Super Admin", "Admin", "CE"]),
   [
     param("id").isUUID().withMessage("Invalid store ID"),
     body("name").notEmpty().withMessage("Name is required"),
@@ -176,7 +176,7 @@ router.put(
 router.delete(
   "/store/:id",
   authenticate,
-  authorize(["SUPER_ADMIN", "ADMIN", "CE"]),
+  authorize(["Super Admin", "Admin", "CE"]),
   [param("id").isUUID().withMessage("Invalid store ID")],
   storeController.deleteStore
 );

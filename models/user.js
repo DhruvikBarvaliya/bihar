@@ -11,14 +11,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       role: {
         type: ENUM(
-          "SUPER_ADMIN",
-          "ADMIN",
+          "Super Admin",
+          "Admin",
           "JE",
           "AEE",
           "EEE",
           "ESE",
           "CE",
-          "STORE_IN_CHARGE"
+          "Store In Charge"
         ),
       },
       username: {

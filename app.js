@@ -50,7 +50,7 @@ const createDefaultUser = async (userData) => {
 };
 
 sequelize
-  .sync({ force: false, alter: true })
+  .sync({ force: true, alter: true })
   .then(async () => {
     logger.info("Drop and re-sync db.");
     let storeData;
@@ -75,7 +75,7 @@ sequelize
         username: "superadmin",
         password: "superadmin",
         email: "superadmin@gmail.com",
-        role: "SUPER_ADMIN",
+        role: "Super Admin",
         is_active: true,
         is_verified: true,
         store_id: store_data_id, // Store foreign key field
@@ -94,7 +94,7 @@ sequelize
         username: "admin",
         password: "admin",
         email: "admin@gmail.com",
-        role: "ADMIN",
+        role: "Admin",
         is_active: true,
         is_verified: true,
         store_id: store_data_id, // Store foreign key field
