@@ -15,10 +15,6 @@ const sequelize = new Sequelize(
 const User = require("../models/user")(sequelize, Sequelize);
 const Store = require("../models/store")(sequelize, Sequelize);
 const Inventory = require("../models/inventory")(sequelize, Sequelize);
-const StoreInventory = require("../models/storeInventory")(
-  sequelize,
-  Sequelize
-);
 
 // Relationships
 Store.hasMany(User, {
@@ -31,18 +27,14 @@ User.belongsTo(Store, {
   as: "store",
 });
 
-Store.belongsToMany(Inventory, {
-  through: StoreInventory,
+Store.hasMany(Inventory, {
   foreignKey: "store_id",
-  otherKey: "inventory_id",
-  as: "Inventory",
+  as: "inventory",
 });
 
-Inventory.belongsToMany(Store, {
-  through: StoreInventory,
-  foreignKey: "inventory_id",
-  otherKey: "store_id",
-  as: "stores",
+Inventory.belongsTo(Store, {
+  foreignKey: "store_id",
+  as: "store",
 });
 
 module.exports = {
@@ -50,5 +42,4 @@ module.exports = {
   User,
   Store,
   Inventory,
-  StoreInventory,
 };

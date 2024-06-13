@@ -1,4 +1,4 @@
-const { Inventory } = require("../config/sequelize");
+const { Inventory, Store } = require("../config/sequelize");
 const { Op } = require("sequelize");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
@@ -29,6 +29,10 @@ exports.getAllInventory = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const { count, rows } = await Inventory.findAndCountAll({
+      include: {
+        model: Store,
+        as: "store",
+      },
       offset,
       limit,
     });
@@ -59,6 +63,10 @@ exports.searchInventory = async (req, res) => {
     const offset = (page - 1) * limit;
     console.log("keyword", keyword);
     const { count, rows } = await Inventory.findAndCountAll({
+      include: {
+        model: Store,
+        as: "store",
+      },
       where: {
         item_name: {
           [Op.like]: `%${keyword}%`,
@@ -90,7 +98,13 @@ exports.searchInventory = async (req, res) => {
 exports.getInventoryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const inventory = await Inventory.findByPk(id);
+    const inventory = await Inventory.findOne({
+      where: { id: id },
+      include: {
+        model: Store,
+        as: "store",
+      },
+    });
     if (!inventory) {
       logger.error("Inventory not found");
       sendResponse(res, "fail", "Inventory not found", null, null, {
@@ -120,6 +134,10 @@ exports.getInventoryByStoreId = async (req, res) => {
     const inventory = await Inventory.findAll({
       where: {
         store_id: store_id,
+      },
+      include: {
+        model: Store,
+        as: "store",
       },
     });
     if (!inventory) {
