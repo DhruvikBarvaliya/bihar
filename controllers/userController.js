@@ -1,11 +1,17 @@
-const { User } = require("../config/sequelize");
+const { User, Store } = require("../config/sequelize");
 const logger = require("../middlewares/logger");
 const { Op } = require("sequelize");
 const sendResponse = require("../utils/responseHelper");
 
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findOne({
+      where: { id: req.params.id },
+      include: {
+        model: Store,
+        as: "store",
+      },
+    });
 
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
@@ -63,6 +69,10 @@ exports.listUsers = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const users = await User.findAndCountAll({
+      include: {
+        model: Store,
+        as: "store",
+      },
       offset: parseInt(offset, 10),
       limit: parseInt(limit, 10),
     });
@@ -113,6 +123,10 @@ exports.searchUsers = async (req, res) => {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const users = await User.findAndCountAll({
+      include: {
+        model: Store,
+        as: "store",
+      },
       where: {
         [Op.or]: [
           { username: { [Op.like]: `%${keyword}%` } },
