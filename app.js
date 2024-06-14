@@ -6,12 +6,33 @@ const logger = require("./middlewares/logger");
 const indexRouter = require("./routes/index");
 const swaggerSetup = require("./config/swagger");
 const { sequelize, User, Store } = require("./config/sequelize");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 const { port, env } = config;
+
+// Define the log directory and log file
+const logDir = path.join(__dirname, "logs"); // Adjust the path as needed
+const combinedlogFile = path.join(logDir, "combined.log");
+const errorlogFile = path.join(logDir, "error.log");
+console.log("Log Directory:", logDir);
+
+// Function to delete the log file
+const deleteLogFile = () => {
+  [combinedlogFile, errorlogFile].forEach((file) => {
+    if (fs.existsSync(file)) {
+      fs.unlinkSync(file);
+      console.log("Old log file deleted. file: ", file);
+    }
+  });
+};
+
+// Call the function before starting the server
+deleteLogFile();
 
 // Swagger setup
 swaggerSetup(app);
