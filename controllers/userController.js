@@ -1,16 +1,22 @@
+// controllers/userController.js
 const { User, Store } = require("../config/sequelize");
 const logger = require("../middlewares/logger");
 const { Op } = require("sequelize");
 const sendResponse = require("../utils/responseHelper");
 
+const excludeSensitiveInfo = (user) => {
+  const userJSON = user.toJSON();
+  delete userJSON.password;
+  delete userJSON.verified_otp;
+  delete userJSON.forgot_otp;
+  return userJSON;
+};
+
 exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findOne({
       where: { id: req.params.id },
-      include: {
-        model: Store,
-        as: "store",
-      },
+      include: { model: Store, as: "store" },
     });
 
     if (!user) {
@@ -20,13 +26,8 @@ exports.getUserProfile = async (req, res) => {
       });
     }
 
-    const userProfile = user.toJSON();
-    delete userProfile.password;
-    delete userProfile.verified_otp;
-    delete userProfile.forgot_otp;
-
     sendResponse(res, "success", "User profile retrieved successfully", {
-      userProfile,
+      userProfile: excludeSensitiveInfo(user),
     });
   } catch (error) {
     logger.error(error);
@@ -38,6 +39,7 @@ exports.updateUserProfile = async (req, res) => {
   try {
     const { username, role, store_id } = req.body;
     const user = await User.findByPk(req.params.id);
+
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
       return sendResponse(res, "fail", "User not found", null, null, {
@@ -50,14 +52,9 @@ exports.updateUserProfile = async (req, res) => {
     user.store_id = store_id || user.store_id;
     await user.save();
 
-    const userProfile = user.toJSON();
-    delete userProfile.password;
-    delete userProfile.verified_otp;
-    delete userProfile.forgot_otp;
-
     logger.info(`User profile updated for ID ${req.params.id}`);
     sendResponse(res, "success", "User profile updated successfully", {
-      userProfile,
+      userProfile: excludeSensitiveInfo(user),
     });
   } catch (error) {
     logger.error(error);
@@ -69,30 +66,20 @@ exports.listUsers = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    const users = await User.findAndCountAll({
-      include: {
-        model: Store,
-        as: "store",
-      },
+    const { count, rows } = await User.findAndCountAll({
+      include: { model: Store, as: "store" },
       offset: parseInt(offset, 10),
       limit: parseInt(limit, 10),
     });
-    const totalPages = Math.ceil(users.count / limit);
 
-    const userList = users.rows.map((user) => {
-      const userJSON = user.toJSON();
-      delete userJSON.password;
-      delete userJSON.verified_otp;
-      delete userJSON.forgot_otp;
-      return userJSON;
-    });
+    const totalPages = Math.ceil(count / limit);
 
     logger.info(`Users listed, page ${page}`);
     sendResponse(res, "success", "Users listed successfully", {
-      totalItems: users.count,
+      totalItems: count,
       totalPages,
-      currentPage: parseInt(page),
-      users: userList,
+      currentPage: parseInt(page, 10),
+      users: rows.map(excludeSensitiveInfo),
     });
   } catch (error) {
     logger.error(error);
@@ -103,6 +90,7 @@ exports.listUsers = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id);
+
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
       return sendResponse(res, "fail", "User not found", null, null, {
@@ -123,11 +111,9 @@ exports.searchUsers = async (req, res) => {
   try {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    const users = await User.findAndCountAll({
-      include: {
-        model: Store,
-        as: "store",
-      },
+
+    const { count, rows } = await User.findAndCountAll({
+      include: { model: Store, as: "store" },
       where: {
         [Op.or]: [
           { username: { [Op.like]: `%${keyword}%` } },
@@ -137,22 +123,15 @@ exports.searchUsers = async (req, res) => {
       offset: parseInt(offset, 10),
       limit: parseInt(limit, 10),
     });
-    const totalPages = Math.ceil(users.count / limit);
+
+    const totalPages = Math.ceil(count / limit);
     logger.info(`Users searched with keyword "${keyword}", page ${page}`);
 
-    const userList = users.rows.map((user) => {
-      const userJSON = user.toJSON();
-      delete userJSON.password;
-      delete userJSON.verified_otp;
-      delete userJSON.forgot_otp;
-      return userJSON;
-    });
-
     sendResponse(res, "success", "Users searched successfully", {
-      totalItems: users.count,
+      totalItems: count,
       totalPages,
-      currentPage: parseInt(page),
-      users: userList,
+      currentPage: parseInt(page, 10),
+      users: rows.map(excludeSensitiveInfo),
     });
   } catch (error) {
     logger.error(error);

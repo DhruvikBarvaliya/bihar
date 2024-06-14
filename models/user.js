@@ -1,3 +1,4 @@
+// models/user.js
 module.exports = (sequelize, DataTypes) => {
   const { UUID, UUIDV4, ENUM, STRING, BOOLEAN, INTEGER } = DataTypes;
 
@@ -20,10 +21,12 @@ module.exports = (sequelize, DataTypes) => {
           "CE",
           "Store In Charge"
         ),
+        allowNull: false,
       },
       username: {
         type: STRING,
         unique: true,
+        allowNull: false,
       },
       email: {
         type: STRING,
@@ -32,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       password: {
         type: STRING,
+        allowNull: false,
       },
       is_active: {
         type: BOOLEAN,
@@ -49,11 +53,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       store_id: {
         type: UUID,
+        allowNull: false,
         references: {
           model: "stores",
           key: "id",
         },
-        allowNull: false,
       },
     },
     {

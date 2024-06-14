@@ -1,5 +1,6 @@
-const Sequelize = require("sequelize");
+const { Sequelize } = require("sequelize");
 const config = require("./config");
+
 const sequelize = new Sequelize(
   config.database,
   config.username,
@@ -17,29 +18,10 @@ const Store = require("../models/store")(sequelize, Sequelize);
 const Inventory = require("../models/inventory")(sequelize, Sequelize);
 
 // Relationships
-Store.hasMany(User, {
-  foreignKey: "store_id",
-  as: "users",
-});
+Store.hasMany(User, { foreignKey: "store_id", as: "users" });
+User.belongsTo(Store, { foreignKey: "store_id", as: "store" });
 
-User.belongsTo(Store, {
-  foreignKey: "store_id",
-  as: "store",
-});
+Store.hasMany(Inventory, { foreignKey: "store_id", as: "inventory" });
+Inventory.belongsTo(Store, { foreignKey: "store_id", as: "store" });
 
-Store.hasMany(Inventory, {
-  foreignKey: "store_id",
-  as: "inventory",
-});
-
-Inventory.belongsTo(Store, {
-  foreignKey: "store_id",
-  as: "store",
-});
-
-module.exports = {
-  sequelize,
-  User,
-  Store,
-  Inventory,
-};
+module.exports = { sequelize, User, Store, Inventory };

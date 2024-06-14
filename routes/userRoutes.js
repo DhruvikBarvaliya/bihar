@@ -96,20 +96,35 @@ router.get(
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: query
+ *         name: keyword
  *         required: true
  *         schema:
  *           type: string
  *         description: Search query
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Number of users per page
  *     responses:
  *       200:
  *         description: List of users matching search query
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 totalPages:
+ *                   type: integer
  *       500:
  *         description: Server error
  */
@@ -117,7 +132,6 @@ router.get(
   "/users/search",
   authenticate,
   authorize(["Super Admin", "Admin", "CE"]),
-  authenticate,
   userController.searchUsers
 );
 
@@ -148,7 +162,11 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get("/users/:id", authenticate, userController.getUserProfile);
+router.get(
+  "/users/:id",
+  authenticate,
+  userController.getUserProfile
+);
 
 /**
  * @swagger
@@ -176,6 +194,9 @@ router.get("/users/:id", authenticate, userController.getUserProfile);
  *                 type: string
  *               email:
  *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [Super Admin, Admin, JE, AEE, EEE, ESE, CE, Store In Charge]
  *     responses:
  *       200:
  *         description: User profile updated
@@ -188,7 +209,11 @@ router.get("/users/:id", authenticate, userController.getUserProfile);
  *       500:
  *         description: Server error
  */
-router.put("/users/:id", authenticate, userController.updateUserProfile);
+router.put(
+  "/users/:id",
+  authenticate,
+  userController.updateUserProfile
+);
 
 /**
  * @swagger
@@ -213,6 +238,11 @@ router.put("/users/:id", authenticate, userController.updateUserProfile);
  *       500:
  *         description: Server error
  */
-router.delete("/users/:id", authenticate, userController.deleteUser);
+router.delete(
+  "/users/:id",
+  authenticate,
+  authorize(["Super Admin", "Admin", "CE"]),
+  userController.deleteUser
+);
 
 module.exports = router;

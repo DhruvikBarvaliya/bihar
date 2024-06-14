@@ -1,6 +1,7 @@
+// controllers/authController.js
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { User,Store} = require("../config/sequelize");
+const { User, Store } = require("../config/sequelize");
 const config = require("../config/config");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
@@ -8,24 +9,32 @@ const sendResponse = require("../utils/responseHelper");
 exports.register = async (req, res) => {
   try {
     const { username, role, email, password, store_id } = req.body;
+    if (!store_id || !password || !email || !username) {
+      logger.error("Mandatory fields are missing");
+      return sendResponse(res, "fail", "Mandatory fields are missing");
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
-    let user = await User.findOne({ where: { email } });
-    let user_name = await User.findOne({ where: { username } });
+
+    const [user, userName] = await Promise.all([
+      User.findOne({ where: { email } }),
+      User.findOne({ where: { username } }),
+    ]);
 
     if (user) {
-      logger.error("User Already Registered with this Email");
+      logger.error("User already registered with this email");
       return sendResponse(
         res,
         "fail",
-        "User Already Registered with this Email",
+        "User already registered with this email",
         null,
         null,
         { email }
       );
     }
-    if (user_name) {
-      logger.error("User Name already Exists");
-      return sendResponse(res, "fail", "User Name already Exists", null, null, {
+
+    if (userName) {
+      logger.error("Username already exists");
+      return sendResponse(res, "fail", "Username already exists", null, null, {
         username,
       });
     }
@@ -35,7 +44,7 @@ exports.register = async (req, res) => {
       return sendResponse(res, "fail", "Role is mandatory");
     }
 
-    user = await User.create({
+    const newUser = await User.create({
       username,
       role,
       email,
@@ -44,7 +53,7 @@ exports.register = async (req, res) => {
       is_active: true,
     });
 
-    const userJSON = user.toJSON();
+    const userJSON = newUser.toJSON();
     delete userJSON.password;
     delete userJSON.verified_otp;
     delete userJSON.forgot_otp;
@@ -66,7 +75,7 @@ exports.login = async (req, res) => {
       where: { email },
       include: {
         model: Store,
-        as: 'store',
+        as: "store",
       },
     });
 
@@ -76,7 +85,12 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role ,email:user.email,store_id:user.store_id},
+      {
+        id: user.id,
+        role: user.role,
+        email: user.email,
+        store_id: user.store_id,
+      },
       config.JWT_SECRET,
       { expiresIn: "12h" }
     );
@@ -86,7 +100,7 @@ exports.login = async (req, res) => {
     delete user.dataValues.verified_otp;
     delete user.dataValues.forgot_otp;
 
-    sendResponse(res, "success", "Login successful", { token ,user},);
+    sendResponse(res, "success", "Login successful", { token, user });
   } catch (error) {
     logger.error(`Login error: ${error.message}`);
     sendResponse(res, "fail", "Server error", null, error.message);
@@ -113,7 +127,7 @@ exports.changePassword = async (req, res) => {
 
     sendResponse(res, "success", "Password changed successfully");
   } catch (error) {
-    logger.error(`Change Password error: ${error.message}`);
+    logger.error(`Change password error: ${error.message}`);
     sendResponse(res, "fail", "Server error", null, error.message);
   }
 };

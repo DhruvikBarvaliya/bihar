@@ -29,10 +29,7 @@ exports.getAllInventory = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const { count, rows } = await Inventory.findAndCountAll({
-      include: {
-        model: Store,
-        as: "store",
-      },
+      include: { model: Store, as: "store" },
       offset,
       limit,
     });
@@ -61,17 +58,9 @@ exports.searchInventory = async (req, res) => {
   try {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    console.log("keyword", keyword);
     const { count, rows } = await Inventory.findAndCountAll({
-      include: {
-        model: Store,
-        as: "store",
-      },
-      where: {
-        item_name: {
-          [Op.like]: `%${keyword}%`,
-        },
-      },
+      include: { model: Store, as: "store" },
+      where: { item_name: { [Op.like]: `%${keyword}%` } },
       offset,
       limit,
     });
@@ -99,11 +88,8 @@ exports.getInventoryById = async (req, res) => {
   try {
     const { id } = req.params;
     const inventory = await Inventory.findOne({
-      where: { id: id },
-      include: {
-        model: Store,
-        as: "store",
-      },
+      where: { id },
+      include: { model: Store, as: "store" },
     });
     if (!inventory) {
       logger.error("Inventory not found");
@@ -127,32 +113,33 @@ exports.getInventoryById = async (req, res) => {
     );
   }
 };
+
 exports.getInventoryByStoreId = async (req, res) => {
-  console.log("store_id", req.params.store_id);
   try {
     const { store_id } = req.params;
     const inventory = await Inventory.findAll({
-      where: {
-        store_id: store_id,
-      },
-      include: {
-        model: Store,
-        as: "store",
-      },
+      where: { store_id },
+      include: { model: Store, as: "store" },
     });
     if (!inventory) {
       logger.error("Inventory not found");
       sendResponse(res, "fail", "Inventory not found", null, null, {
-        inventoryId: id,
+        inventoryId: store_id,
       });
     } else {
-      logger.info("Inventory retrieved by ID: ", JSON.stringify(inventory));
+      logger.info(
+        "Inventory retrieved by Store ID: ",
+        JSON.stringify(inventory)
+      );
       sendResponse(res, "success", "Inventory retrieved successfully", {
         inventory,
       });
     }
   } catch (error) {
-    logger.error("Error retrieving inventory by ID: ", JSON.stringify(error));
+    logger.error(
+      "Error retrieving inventory by Store ID: ",
+      JSON.stringify(error)
+    );
     sendResponse(
       res,
       "fail",
@@ -195,9 +182,7 @@ exports.updateInventory = async (req, res) => {
 
 exports.deleteInventory = async (req, res) => {
   try {
-    const deleted = await Inventory.destroy({
-      where: { id: req.params.id },
-    });
+    const deleted = await Inventory.destroy({ where: { id: req.params.id } });
     if (deleted) {
       logger.info(`Deleted Inventory with ID: ${req.params.id}`);
       sendResponse(res, "success", "Inventory deleted successfully");

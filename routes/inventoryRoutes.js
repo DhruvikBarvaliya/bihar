@@ -151,7 +151,7 @@ router.get("/inventory/:id", inventoryController.getInventoryById);
  * @swagger
  * /inventory/store/{store_id}:
  *   get:
- *     summary: Get inventory item by Store ID
+ *     summary: Get inventory items by Store ID
  *     tags: [Inventory]
  *     parameters:
  *       - in: path
@@ -167,7 +167,11 @@ router.get("/inventory/:id", inventoryController.getInventoryById);
  *       500:
  *         description: Server error
  */
-router.get("/inventory/store/:store_id", inventoryController.getInventoryByStoreId);
+router.get(
+  "/inventory/store/:store_id",
+  authenticate,
+  inventoryController.getInventoryByStoreId
+);
 
 /**
  * @swagger
