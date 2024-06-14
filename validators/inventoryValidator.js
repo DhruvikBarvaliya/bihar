@@ -1,4 +1,5 @@
 const { check, validationResult } = require("express-validator");
+const sendResponse = require("../utils/responseHelper");
 
 exports.validateInventory = [
   check("item_name").notEmpty().withMessage("Item name is required"),
