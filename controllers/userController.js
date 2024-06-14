@@ -36,7 +36,7 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   try {
-    const { username, role } = req.body;
+    const { username, role, store_id } = req.body;
     const user = await User.findByPk(req.params.id);
     if (!user) {
       logger.info(`User with ID ${req.params.id} not found`);
@@ -47,6 +47,7 @@ exports.updateUserProfile = async (req, res) => {
 
     user.username = username || user.username;
     user.role = role || user.role;
+    user.store_id = store_id || user.store_id;
     await user.save();
 
     const userProfile = user.toJSON();
