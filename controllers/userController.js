@@ -34,6 +34,32 @@ exports.getUserProfile = async (req, res) => {
     sendResponse(res, "fail", "Server error", null, error.message);
   }
 };
+exports.getUsersByStoreId = async (req, res) => {
+  try {
+    const { store_id } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await User.findAndCountAll({
+      where: { store_id: store_id },
+      include: { model: Store, as: "store" },
+      offset: parseInt(offset, 10),
+      limit: parseInt(limit, 10),
+    });
+
+    const totalPages = Math.ceil(count / limit);
+
+    sendResponse(res, "success", "Users retrieved successfully", {
+      totalItems: count,
+      totalPages,
+      currentPage: parseInt(page, 10),
+      users: rows.map(excludeSensitiveInfo),
+    });
+  } catch (error) {
+    logger.error(error);
+    sendResponse(res, "fail", "Server error", null, error.message);
+  }
+};
 
 exports.updateUserProfile = async (req, res) => {
   try {

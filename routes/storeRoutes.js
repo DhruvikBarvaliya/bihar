@@ -55,6 +55,35 @@ router.get("/store", authenticate, storeController.getAllStore);
 
 /**
  * @swagger
+ * /store/search:
+ *   get:
+ *     summary: Search store items
+ *     tags: [Store]
+ *     parameters:
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: Store search completed successfully
+ *       500:
+ *         description: Server error
+ */
+router.get("/store/search", authenticate, storeController.searchStore);
+
+/**
+ * @swagger
  * /stores/{id}:
  *   get:
  *     summary: Get a store by ID
@@ -180,5 +209,7 @@ router.delete(
   [param("id").isUUID().withMessage("Invalid store ID")],
   storeController.deleteStore
 );
+
+
 
 module.exports = router;

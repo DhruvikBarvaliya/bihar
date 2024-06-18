@@ -170,6 +170,39 @@ router.get(
 
 /**
  * @swagger
+ * /usersByStoreId/{store_id}:
+ *   get:
+ *     summary: Get users By Store Id
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: store_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Store ID
+ *     responses:
+ *       200:
+ *         description: User profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.get(
+  "/usersByStoreId/:store_id",
+  authenticate,
+  userController.getUsersByStoreId
+);
+
+/**
+ * @swagger
  * /users/{id}:
  *   put:
  *     summary: Update user profile

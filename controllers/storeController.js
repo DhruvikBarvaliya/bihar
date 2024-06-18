@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const { Store } = require("../config/sequelize");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
+const { Op } = require("sequelize");
 exports.createStore = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -97,5 +98,34 @@ exports.deleteStore = async (req, res) => {
   } catch (error) {
     logger.error(`Error deleting store: ${error.message}`);
     sendResponse(res, "fail", "Error deleting store", null, error.message);
+  }
+};
+
+exports.searchStore = async (req, res) => {
+  try {
+    const { keyword, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+    const { count, rows } = await Store.findAndCountAll({
+      where: { name: { [Op.like]: `%${keyword}%` } },
+      offset,
+      limit,
+    });
+    const totalPages = Math.ceil(count / limit);
+    const response = {
+      totalItems: count,
+      totalPages,
+      currentPage: parseInt(page),
+      stores: rows,
+    };
+    logger.info("Store search completed");
+    sendResponse(
+      res,
+      "success",
+      "Store search completed successfully",
+      response
+    );
+  } catch (error) {
+    logger.error("Error searching Store: ", JSON.stringify(error));
+    sendResponse(res, "fail", "Error searching Store", null, error.message);
   }
 };
