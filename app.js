@@ -71,7 +71,7 @@ const createDefaultUser = async (userData) => {
 };
 
 sequelize
-  .sync({ force: true, alter: true })
+  .sync({ force: false, alter: true })
   .then(async () => {
     logger.info("Drop and re-sync db.");
     let storeData;
