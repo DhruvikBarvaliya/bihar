@@ -15,9 +15,10 @@ exports.register = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [user, userName] = await Promise.all([
+    const [user, userName, existingUser] = await Promise.all([
       User.findOne({ where: { email } }),
       User.findOne({ where: { username } }),
+      User.findOne({ where: { role, store_id } }),
     ]);
 
     if (user) {
@@ -37,6 +38,18 @@ exports.register = async (req, res) => {
       return sendResponse(res, "fail", "Username already exists", null, null, {
         username,
       });
+    }
+
+    if (role == "CE" && existingUser) {
+      logger.error("CE Role already exists for this store");
+      return sendResponse(
+        res,
+        "fail",
+        "CE Role already exists for this store",
+        null,
+        null,
+        { role, store_id }
+      );
     }
 
     if (!role) {
