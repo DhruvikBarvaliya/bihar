@@ -173,4 +173,38 @@ router.post("/auth/login", authController.login);
  */
 router.post("/auth/change-password/:id", authController.changePassword);
 
+/**
+ * @swagger
+ * /auth/dashboard:
+ *   get:
+ *     summary: Get user dashboard data
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: role
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user role
+ *       - in: path
+ *         name: store_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The store ID
+ *     responses:
+ *       200:
+ *         description: Success
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get(
+  "/auth/dashboard/:role/:store_id",
+  authenticate,
+  authorize(["Super Admin", "Admin", "CE"]),
+  authController.dashboard
+);
+
 module.exports = router;

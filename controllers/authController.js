@@ -1,14 +1,22 @@
 // controllers/authController.js
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { User, Store } = require("../config/sequelize");
+const { User, Store, Inventory } = require("../config/sequelize");
 const config = require("../config/config");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
 
 exports.register = async (req, res) => {
   try {
-    const { username, role, email, password, store_id } = req.body;
+    const {
+      username,
+      role,
+      email,
+      password,
+      store_id,
+      created_by,
+      updated_by,
+    } = req.body;
     if (!store_id || !password || !email || !username) {
       logger.error("Mandatory fields are missing");
       return sendResponse(res, "fail", "Mandatory fields are missing");
@@ -64,6 +72,8 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       store_id,
       is_active: true,
+      created_by,
+      updated_by,
     });
 
     const userJSON = newUser.toJSON();
@@ -141,6 +151,42 @@ exports.changePassword = async (req, res) => {
     sendResponse(res, "success", "Password changed successfully");
   } catch (error) {
     logger.error(`Change password error: ${error.message}`);
+    sendResponse(res, "fail", "Server error", null, error.message);
+  }
+};
+
+exports.dashboard = async (req, res) => {
+  try {
+    const { role, store_id } = req.params;
+    console.log(role, store_id);
+
+    let userCount, inventoryCount, storeCount;
+
+    if (role === "Admin" || role === "Super Admin") {
+      userCount = await User.count();
+      inventoryCount = await Inventory.count();
+      storeCount = await Store.count();
+    } else {
+      userCount = await User.count({
+        where: { store_id },
+      });
+
+      inventoryCount = await Inventory.count({
+        where: { store_id },
+      });
+
+      storeCount = await Store.count({
+        where: { id:store_id },
+      });
+    }
+
+    sendResponse(res, "success", "Dashboard data retrieved successfully", {
+      userCount,
+      inventoryCount,
+      storeCount,
+    });
+  } catch (error) {
+    logger.error(`Dashboard error: ${error.message}`);
     sendResponse(res, "fail", "Server error", null, error.message);
   }
 };
