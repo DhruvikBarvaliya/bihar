@@ -59,6 +59,22 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
+      created_by: {
+        type: UUID,
+        allowNull: true,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
+      updated_by: {
+        type: UUID,
+        allowNull: true,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
     },
     {
       tableName: "users",

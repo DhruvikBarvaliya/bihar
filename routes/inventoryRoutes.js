@@ -33,7 +33,9 @@ const authorize = require("../middlewares/authorize");
  *           type: integer
  *         is_available:
  *           type: boolean
- *         description:
+ *         value:
+ *           type: string
+ *         specification:
  *           type: string
  *         store_id:
  *           type: string

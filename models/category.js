@@ -1,45 +1,27 @@
+// models/store.js
 module.exports = (sequelize, DataTypes) => {
-  const Inventory = sequelize.define(
-    "Inventory",
+  const Category = sequelize.define(
+    "Category",
     {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      item_name: {
+      category_name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      quantity: {
-        type: DataTypes.BIGINT,
-        defaultValue: 0,
-      },
-      value: {
-        type: DataTypes.BIGINT,
-        defaultValue: 0,
-      },
-      is_available: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      specification: {
+      code: {
         type: DataTypes.STRING,
+        allowNull: true,
       },
-      notes: {
+      description: {
         type: DataTypes.STRING,
       },
       is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
-      },
-      store_id: {
-        type: DataTypes.UUID,
-        references: {
-          model: "stores",
-          key: "id",
-        },
-        allowNull: false,
       },
       created_by: {
         type: DataTypes.UUID,
@@ -59,11 +41,11 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: "inventories",
+      tableName: "categories",
       timestamps: true,
       underscored: true,
     }
   );
 
-  return Inventory;
+  return Category;
 };

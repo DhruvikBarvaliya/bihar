@@ -16,6 +16,8 @@ const sequelize = new Sequelize(
 const User = require("../models/user")(sequelize, Sequelize);
 const Store = require("../models/store")(sequelize, Sequelize);
 const Inventory = require("../models/inventory")(sequelize, Sequelize);
+const Category = require("../models/category")(sequelize, Sequelize);
+const Unit = require("../models/unit")(sequelize, Sequelize);
 
 // Relationships
 Store.hasMany(User, { foreignKey: "store_id", as: "users" });
@@ -24,4 +26,4 @@ User.belongsTo(Store, { foreignKey: "store_id", as: "store" });
 Store.hasMany(Inventory, { foreignKey: "store_id", as: "inventory" });
 Inventory.belongsTo(Store, { foreignKey: "store_id", as: "store" });
 
-module.exports = { sequelize, User, Store, Inventory };
+module.exports = { sequelize, User, Store, Inventory,Category,Unit };
