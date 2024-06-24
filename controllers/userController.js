@@ -63,28 +63,29 @@ exports.getUsersByStoreId = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   try {
-    const { username, role, store_id } = req.body;
-    const user = await User.findByPk(req.params.id);
-
-    if (!user) {
-      logger.info(`User with ID ${req.params.id} not found`);
+    const [updated] = await User.update(req.body, {
+      where: { id: req.params.id },
+    });
+    if (!updated) {
+      logger.warn(`User not found with ID: ${req.params.id}`);
       return sendResponse(res, "fail", "User not found", null, null, {
         userId: req.params.id,
       });
     }
+    const userJSON = await User.findByPk(req.params.id);
 
-    user.username = username || user.username;
-    user.role = role || user.role;
-    user.store_id = store_id || user.store_id;
-    await user.save();
+    const updatedUser = userJSON.toJSON();
+    delete updatedUser.password;
+    delete updatedUser.verified_otp;
+    delete updatedUser.forgot_otp;
 
-    logger.info(`User profile updated for ID ${req.params.id}`);
-    sendResponse(res, "success", "User profile updated successfully", {
-      userProfile: excludeSensitiveInfo(user),
+    logger.info(`Updated user with ID: ${updatedUser.id}`);
+    sendResponse(res, "success", "User updated successfully", {
+      updatedUser,
     });
   } catch (error) {
-    logger.error(error);
-    sendResponse(res, "fail", "Server error", null, error.message);
+    logger.error(`Error updating user: ${error.message}`);
+    sendResponse(res, "fail", "Error updating user", null, error.message);
   }
 };
 
