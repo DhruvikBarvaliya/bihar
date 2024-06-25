@@ -1,5 +1,7 @@
 const { Inventory, Store, Category } = require("../config/sequelize");
 const { Op } = require("sequelize");
+const jwt = require("jsonwebtoken");
+const config = require("../config/config");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
 
@@ -15,9 +17,10 @@ exports.createInventory = async (req, res) => {
       is_active,
       store_id,
       category_id,
-      created_by,
-      updated_by,
     } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    const { id } = decodedToken;
     const inventory = await Inventory.create({
       item_name,
       quantity,
@@ -28,8 +31,8 @@ exports.createInventory = async (req, res) => {
       is_active,
       store_id,
       category_id,
-      created_by,
-      updated_by,
+      created_by: id,
+      updated_by: id,
     });
     logger.info("Inventory created: ", JSON.stringify(inventory));
     sendResponse(res, "success", "Inventory created successfully", {
@@ -192,8 +195,6 @@ exports.updateInventory = async (req, res) => {
       is_active,
       store_id,
       category_id,
-      created_by,
-      updated_by,
     } = req.body;
     const inventory = await Inventory.findByPk(id);
     if (!inventory) {
@@ -202,6 +203,9 @@ exports.updateInventory = async (req, res) => {
         inventoryId: id,
       });
     } else {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, config.JWT_SECRET);
+      const { id } = decodedToken;
       const updatedInventory = await inventory.update({
         item_name,
         quantity,
@@ -212,8 +216,7 @@ exports.updateInventory = async (req, res) => {
         is_active,
         store_id,
         category_id,
-        created_by,
-        updated_by,
+        updated_by: id,
       });
       logger.info("Inventory updated: ", JSON.stringify(updatedInventory));
       sendResponse(res, "success", "Inventory updated successfully", {

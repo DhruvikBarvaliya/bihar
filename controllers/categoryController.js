@@ -1,5 +1,7 @@
 const { validationResult } = require("express-validator");
 const { Category } = require("../config/sequelize");
+const jwt = require("jsonwebtoken");
+const config = require("../config/config");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
 const { Op } = require("sequelize");
@@ -15,7 +17,11 @@ exports.createCategory = async (req, res) => {
         errors.array()
       );
     }
-
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    const { id } = decodedToken;
+    req.body.created_by = id;
+    req.body.updated_by = id;
     const category = await Category.create(req.body);
     logger.info(`Category created with ID: ${category.id}`);
     sendResponse(res, "success", "Category created successfully", { category });
@@ -72,6 +78,10 @@ exports.getCategoryById = async (req, res) => {
 
 exports.updateCategory = async (req, res) => {
   try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    const { id } = decodedToken;
+    req.body.updated_by = id;
     const [updated] = await Category.update(req.body, {
       where: { id: req.params.id },
     });

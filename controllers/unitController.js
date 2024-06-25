@@ -1,5 +1,7 @@
 const { validationResult } = require("express-validator");
 const { Unit } = require("../config/sequelize");
+const jwt = require("jsonwebtoken");
+const config = require("../config/config");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
 const { Op } = require("sequelize");
@@ -15,7 +17,11 @@ exports.createUnit = async (req, res) => {
         errors.array()
       );
     }
-
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    const { id } = decodedToken;
+    req.body.created_by = id;
+    req.body.updated_by = id;
     const unit = await Unit.create(req.body);
     logger.info(`Unit created with ID: ${unit.id}`);
     sendResponse(res, "success", "Unit created successfully", { unit });
@@ -41,13 +47,7 @@ exports.getAllUnit = async (req, res) => {
     sendResponse(res, "success", "Unit retrieved successfully", response);
   } catch (error) {
     logger.error(`Error retrieving units: ${error.message}`);
-    sendResponse(
-      res,
-      "fail",
-      "Error retrieving units",
-      null,
-      error.message
-    );
+    sendResponse(res, "fail", "Error retrieving units", null, error.message);
   }
 };
 
@@ -72,6 +72,10 @@ exports.getUnitById = async (req, res) => {
 
 exports.updateUnit = async (req, res) => {
   try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    const { id } = decodedToken;
+    req.body.updated_by = id;
     const [updated] = await Unit.update(req.body, {
       where: { id: req.params.id },
     });

@@ -1,6 +1,8 @@
 // controllers/userController.js
 const { User, Store } = require("../config/sequelize");
 const logger = require("../middlewares/logger");
+const jwt = require("jsonwebtoken");
+const config = require("../config/config");
 const { Op } = require("sequelize");
 const sendResponse = require("../utils/responseHelper");
 
@@ -63,6 +65,10 @@ exports.getUsersByStoreId = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    const { id } = decodedToken;
+    req.body.updated_by = id;
     const [updated] = await User.update(req.body, {
       where: { id: req.params.id },
     });

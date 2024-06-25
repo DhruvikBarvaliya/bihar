@@ -8,15 +8,10 @@ const sendResponse = require("../utils/responseHelper");
 
 exports.register = async (req, res) => {
   try {
-    const {
-      username,
-      role,
-      email,
-      password,
-      store_id,
-      created_by,
-      updated_by,
-    } = req.body;
+    const { username, role, email, password, store_id } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    const { id } = decodedToken;
     if (!store_id || !password || !email || !username) {
       logger.error("Mandatory fields are missing");
       return sendResponse(res, "fail", "Mandatory fields are missing");
@@ -72,8 +67,8 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       store_id,
       is_active: true,
-      created_by,
-      updated_by,
+      created_by: id,
+      updated_by: id,
     });
 
     const userJSON = newUser.toJSON();
@@ -132,6 +127,10 @@ exports.login = async (req, res) => {
 
 exports.changePassword = async (req, res) => {
   try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    const { id } = decodedToken;
+
     const { currentPassword, newPassword } = req.body;
     const user = await User.findByPk(req.params.id);
 
@@ -144,7 +143,7 @@ exports.changePassword = async (req, res) => {
     if (!(await bcrypt.compare(currentPassword, user.password))) {
       return sendResponse(res, "fail", "Invalid current password");
     }
-
+    user.updated_by = id;
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
@@ -176,7 +175,7 @@ exports.dashboard = async (req, res) => {
       });
 
       storeCount = await Store.count({
-        where: { id:store_id },
+        where: { id: store_id },
       });
     }
 
