@@ -149,8 +149,8 @@ exports.searchUsers = async (req, res) => {
       include: { model: Store, as: "store" },
       where: {
         [Op.or]: [
-          { username: { [Op.like]: `%${keyword}%` } },
-          { email: { [Op.like]: `%${keyword}%` } },
+          { username: { [Op.iLike]: `%${keyword}%` } },
+          { email: { [Op.iLike]: `%${keyword}%` } },
         ],
       },
       offset: parseInt(offset, 10),

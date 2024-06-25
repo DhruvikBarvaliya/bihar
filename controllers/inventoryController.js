@@ -86,7 +86,7 @@ exports.searchInventory = async (req, res) => {
         { model: Store, as: "store" },
         { model: Category, as: "category" },
       ],
-      where: { item_name: { [Op.like]: `%${keyword}%` } },
+      where: { item_name: { [Op.iLike]: `%${keyword}%` } },
       offset,
       limit,
     });

@@ -116,7 +116,7 @@ exports.searchStore = async (req, res) => {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const { count, rows } = await Store.findAndCountAll({
-      where: { name: { [Op.like]: `%${keyword}%` } },
+      where: { name: { [Op.iLike]: `%${keyword}%` } },
       offset,
       limit,
     });

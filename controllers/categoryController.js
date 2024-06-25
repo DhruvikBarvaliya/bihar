@@ -124,7 +124,7 @@ exports.searchCategory = async (req, res) => {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const { count, rows } = await Category.findAndCountAll({
-      where: { category_name: { [Op.like]: `%${keyword}%` } },
+      where: { category_name: { [Op.iLike]: `%${keyword}%` } },
       offset,
       limit,
     });
