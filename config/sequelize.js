@@ -26,4 +26,7 @@ User.belongsTo(Store, { foreignKey: "store_id", as: "store" });
 Store.hasMany(Inventory, { foreignKey: "store_id", as: "inventory" });
 Inventory.belongsTo(Store, { foreignKey: "store_id", as: "store" });
 
-module.exports = { sequelize, User, Store, Inventory,Category,Unit };
+Category.hasMany(Inventory, { foreignKey: "category_id", as: "inventory" });
+Inventory.belongsTo(Category, { foreignKey: "category_id", as: "category" });
+
+module.exports = { sequelize, User, Store, Inventory, Category, Unit };

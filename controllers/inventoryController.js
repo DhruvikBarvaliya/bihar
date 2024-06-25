@@ -1,4 +1,4 @@
-const { Inventory, Store } = require("../config/sequelize");
+const { Inventory, Store, Category } = require("../config/sequelize");
 const { Op } = require("sequelize");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
@@ -14,6 +14,7 @@ exports.createInventory = async (req, res) => {
       notes,
       is_active,
       store_id,
+      category_id,
       created_by,
       updated_by,
     } = req.body;
@@ -26,6 +27,7 @@ exports.createInventory = async (req, res) => {
       notes,
       is_active,
       store_id,
+      category_id,
       created_by,
       updated_by,
     });
@@ -44,7 +46,10 @@ exports.getAllInventory = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const { count, rows } = await Inventory.findAndCountAll({
-      include: { model: Store, as: "store" },
+      include: [
+        { model: Store, as: "store" },
+        { model: Category, as: "category" },
+      ],
       offset,
       limit,
     });
@@ -74,7 +79,10 @@ exports.searchInventory = async (req, res) => {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const { count, rows } = await Inventory.findAndCountAll({
-      include: { model: Store, as: "store" },
+      include: [
+        { model: Store, as: "store" },
+        { model: Category, as: "category" },
+      ],
       where: { item_name: { [Op.like]: `%${keyword}%` } },
       offset,
       limit,
@@ -104,7 +112,10 @@ exports.getInventoryById = async (req, res) => {
     const { id } = req.params;
     const inventory = await Inventory.findOne({
       where: { id },
-      include: { model: Store, as: "store" },
+      include: [
+        { model: Store, as: "store" },
+        { model: Category, as: "category" },
+      ],
     });
     if (!inventory) {
       logger.error("Inventory not found");
@@ -134,7 +145,10 @@ exports.getInventoryByStoreId = async (req, res) => {
     const { store_id } = req.params;
     const inventory = await Inventory.findAll({
       where: { store_id },
-      include: { model: Store, as: "store" },
+      include: [
+        { model: Store, as: "store" },
+        { model: Category, as: "category" },
+      ],
     });
     if (!inventory) {
       logger.error("Inventory not found");
@@ -177,6 +191,7 @@ exports.updateInventory = async (req, res) => {
       notes,
       is_active,
       store_id,
+      category_id,
       created_by,
       updated_by,
     } = req.body;
@@ -196,6 +211,7 @@ exports.updateInventory = async (req, res) => {
         notes,
         is_active,
         store_id,
+        category_id,
         created_by,
         updated_by,
       });

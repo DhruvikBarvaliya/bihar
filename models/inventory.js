@@ -41,6 +41,14 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
       },
+      category_id: {
+        type: DataTypes.UUID,
+        references: {
+          model: "categories",
+          key: "id",
+        },
+        allowNull: false,
+      },
       created_by: {
         type: DataTypes.UUID,
         allowNull: true,
