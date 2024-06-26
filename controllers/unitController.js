@@ -35,7 +35,11 @@ exports.getAllUnit = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    const { count, rows } = await Unit.findAndCountAll({ offset, limit });
+    const { count, rows } = await Unit.findAndCountAll({
+      offset,
+      limit,
+      order: [["updatedAt", "DESC"]],
+    });
     const totalPages = Math.ceil(count / limit);
     const response = {
       totalUnit: count,
@@ -121,6 +125,7 @@ exports.searchUnit = async (req, res) => {
       where: { unit_name: { [Op.iLike]: `%${keyword}%` } },
       offset,
       limit,
+      order: [["updatedAt", "DESC"]],
     });
     const totalPages = Math.ceil(count / limit);
     const response = {

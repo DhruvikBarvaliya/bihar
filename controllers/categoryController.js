@@ -35,7 +35,11 @@ exports.getAllCategory = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    const { count, rows } = await Category.findAndCountAll({ offset, limit });
+    const { count, rows } = await Category.findAndCountAll({
+      offset,
+      limit,
+      order: [["updatedAt", "DESC"]],
+    });
     const totalPages = Math.ceil(count / limit);
     const response = {
       totalCategory: count,
@@ -127,6 +131,7 @@ exports.searchCategory = async (req, res) => {
       where: { category_name: { [Op.iLike]: `%${keyword}%` } },
       offset,
       limit,
+      order: [["updatedAt", "DESC"]],
     });
     const totalPages = Math.ceil(count / limit);
     const response = {

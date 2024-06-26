@@ -55,6 +55,7 @@ exports.getAllInventory = async (req, res) => {
       ],
       offset,
       limit,
+      order: [["updatedAt", "DESC"]],
     });
     const totalPages = Math.ceil(count / limit);
     const response = {
@@ -89,6 +90,7 @@ exports.searchInventory = async (req, res) => {
       where: { item_name: { [Op.iLike]: `%${keyword}%` } },
       offset,
       limit,
+      order: [["updatedAt", "DESC"]],
     });
     const totalPages = Math.ceil(count / limit);
     const response = {

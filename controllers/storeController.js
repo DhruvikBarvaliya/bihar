@@ -35,7 +35,11 @@ exports.getAllStore = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    const { count, rows } = await Store.findAndCountAll({ offset, limit });
+    const { count, rows } = await Store.findAndCountAll({
+      offset,
+      limit,
+      order: [["updatedAt", "DESC"]],
+    });
     const totalPages = Math.ceil(count / limit);
     const response = {
       totalStores: count,
@@ -84,7 +88,6 @@ exports.updateStore = async (req, res) => {
       });
     }
     const updatedStore = await Store.findByPk(req.params.id);
-    await new Promise(resolve => setTimeout(resolve, 2000));
     logger.info(`Updated store with ID: ${updatedStore.id}`);
     sendResponse(res, "success", "Store updated successfully", {
       updatedStore,
@@ -120,6 +123,7 @@ exports.searchStore = async (req, res) => {
       where: { name: { [Op.iLike]: `%${keyword}%` } },
       offset,
       limit,
+      order: [["updatedAt", "DESC"]],
     });
     const totalPages = Math.ceil(count / limit);
     const response = {

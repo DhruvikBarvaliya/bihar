@@ -47,6 +47,7 @@ exports.getUsersByStoreId = async (req, res) => {
       include: { model: Store, as: "store" },
       offset: parseInt(offset, 10),
       limit: parseInt(limit, 10),
+      order: [["updatedAt", "DESC"]],
     });
 
     const totalPages = Math.ceil(count / limit);
@@ -103,6 +104,7 @@ exports.listUsers = async (req, res) => {
       include: { model: Store, as: "store" },
       offset: parseInt(offset, 10),
       limit: parseInt(limit, 10),
+      order: [["updatedAt", "DESC"]],
     });
 
     const totalPages = Math.ceil(count / limit);
@@ -155,6 +157,7 @@ exports.searchUsers = async (req, res) => {
       },
       offset: parseInt(offset, 10),
       limit: parseInt(limit, 10),
+      order: [["updatedAt", "DESC"]],
     });
 
     const totalPages = Math.ceil(count / limit);
