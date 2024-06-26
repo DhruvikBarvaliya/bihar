@@ -84,6 +84,7 @@ exports.updateStore = async (req, res) => {
       });
     }
     const updatedStore = await Store.findByPk(req.params.id);
+    await new Promise(resolve => setTimeout(resolve, 2000));
     logger.info(`Updated store with ID: ${updatedStore.id}`);
     sendResponse(res, "success", "Store updated successfully", {
       updatedStore,
