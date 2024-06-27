@@ -17,6 +17,7 @@ exports.createInventory = async (req, res) => {
       is_active,
       store_id,
       category_id,
+      unit_id,
     } = req.body;
     const token = req.headers.authorization.split(" ")[1];
     const decodedToken = jwt.verify(token, config.JWT_SECRET);
@@ -31,6 +32,7 @@ exports.createInventory = async (req, res) => {
       is_active,
       store_id,
       category_id,
+      unit_id,
       created_by: id,
       updated_by: id,
     });
@@ -197,6 +199,7 @@ exports.updateInventory = async (req, res) => {
       is_active,
       store_id,
       category_id,
+      unit_id,
     } = req.body;
     const inventory = await Inventory.findByPk(id);
     if (!inventory) {
@@ -218,6 +221,7 @@ exports.updateInventory = async (req, res) => {
         is_active,
         store_id,
         category_id,
+        unit_id,
         updated_by: id,
       });
       logger.info("Inventory updated: ", JSON.stringify(updatedInventory));
