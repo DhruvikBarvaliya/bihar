@@ -30,6 +30,6 @@ Category.hasMany(Inventory, { foreignKey: "category_id", as: "inventory" });
 Inventory.belongsTo(Category, { foreignKey: "category_id", as: "category" });
 
 Unit.hasMany(Inventory, { foreignKey: "unit_id", as: "inventory" });
-Inventory.belongsTo(Unit, { foreignKey: "unit_id", as: "category" });
+Inventory.belongsTo(Unit, { foreignKey: "unit_id", as: "unit" });
 
 module.exports = { sequelize, User, Store, Inventory, Category, Unit };

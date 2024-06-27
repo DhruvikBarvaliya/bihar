@@ -144,6 +144,44 @@ exports.deleteUser = async (req, res) => {
 
 exports.searchUsers = async (req, res) => {
   try {
+    const { keyword, page = 1, limit = 10, store_id } = req.query;
+    const offset = (page - 1) * limit;
+    const whereCondition = {
+      [Op.or]: [
+        { username: { [Op.iLike]: `%${keyword}%` } },
+        { email: { [Op.iLike]: `%${keyword}%` } },
+      ],
+    };
+
+    if (store_id) {
+      whereCondition.store_id = store_id;
+    }
+
+    const { count, rows } = await User.findAndCountAll({
+      include: { model: Store, as: "store" },
+      where: whereCondition,
+      offset: parseInt(offset, 10),
+      limit: parseInt(limit, 10),
+      order: [["updatedAt", "DESC"]],
+    });
+
+    const totalPages = Math.ceil(count / limit);
+    logger.info(`Users searched with keyword "${keyword}", page ${page}`);
+
+    sendResponse(res, "success", "Users searched successfully", {
+      totalItems: count,
+      totalPages,
+      currentPage: parseInt(page, 10),
+      users: rows.map(excludeSensitiveInfo),
+    });
+  } catch (error) {
+    logger.error(error);
+    sendResponse(res, "fail", "Server error", null, error.message);
+  }
+};
+
+exports.searchStoreUsers = async (req, res) => {
+  try {
     const { keyword, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
