@@ -107,32 +107,30 @@ exports.listUsers = async (req, res) => {
       order: [["updatedAt", "DESC"]],
     });
 
-    // Define the roles
     const roles = [
-      "Super Admin",
-      "Admin",
-      "JE",
-      "AEE",
-      "EEE",
-      "ESE",
-      "CE",
-      "Store In Charge",
+      { original: "Super Admin", camelCase: "countOfSuperAdmin" },
+      { original: "Admin", camelCase: "countOfAdmin" },
+      { original: "JE", camelCase: "countOfJe" },
+      { original: "AEE", camelCase: "countOfAee" },
+      { original: "EEE", camelCase: "countOfEee" },
+      { original: "ESE", camelCase: "countOfEse" },
+      { original: "CE", camelCase: "countOfCe" },
+      { original: "Store In Charge", camelCase: "countOfStoreInCharge" },
     ];
 
-    // Initialize an object with roles
+    // Initialize an object with roles in camelCase
     const roleCount = roles.reduce((acc, role) => {
-      acc[role] = 0;
+      acc[role.camelCase] = 0;
       return acc;
     }, {});
 
     // Count the number of users for each role
     rows.forEach((user) => {
-      if (roleCount.hasOwnProperty(user.role)) {
-        roleCount[user.role]++;
+      const role = roles.find((r) => r.original === user.role);
+      if (role) {
+        roleCount[role.camelCase]++;
       }
     });
-
-    // Assign the result to dashboardInfo
     const dashboardInfo = roleCount;
 
     const totalPages = Math.ceil(count / limit);
