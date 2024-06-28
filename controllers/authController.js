@@ -1,7 +1,7 @@
 // controllers/authController.js
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { User, Store, Inventory } = require("../config/sequelize");
+const { User, Store, Inventory,Category,Unit } = require("../config/sequelize");
 const config = require("../config/config");
 const logger = require("../middlewares/logger");
 const sendResponse = require("../utils/responseHelper");
@@ -159,7 +159,7 @@ exports.dashboard = async (req, res) => {
     const { role, store_id } = req.params;
     console.log(role, store_id);
 
-    let userCount, inventoryCount, storeCount;
+    let userCount, inventoryCount, storeCount, categoryCount, unitCount;
 
     if (role === "Admin" || role === "Super Admin") {
       userCount = await User.count();
@@ -177,12 +177,18 @@ exports.dashboard = async (req, res) => {
       storeCount = await Store.count({
         where: { id: store_id },
       });
+
+      categoryCount = await Category.count();
+
+      unitCount = await Unit.count();
     }
 
     sendResponse(res, "success", "Dashboard data retrieved successfully", {
       userCount,
       inventoryCount,
       storeCount,
+      categoryCount,
+      unitCount,
     });
   } catch (error) {
     logger.error(`Dashboard error: ${error.message}`);

@@ -107,6 +107,34 @@ exports.listUsers = async (req, res) => {
       order: [["updatedAt", "DESC"]],
     });
 
+    // Define the roles
+    const roles = [
+      "Super Admin",
+      "Admin",
+      "JE",
+      "AEE",
+      "EEE",
+      "ESE",
+      "CE",
+      "Store In Charge",
+    ];
+
+    // Initialize an object with roles
+    const roleCount = roles.reduce((acc, role) => {
+      acc[role] = 0;
+      return acc;
+    }, {});
+
+    // Count the number of users for each role
+    rows.forEach((user) => {
+      if (roleCount.hasOwnProperty(user.role)) {
+        roleCount[user.role]++;
+      }
+    });
+
+    // Assign the result to dashboardInfo
+    const dashboardInfo = roleCount;
+
     const totalPages = Math.ceil(count / limit);
 
     logger.info(`Users listed, page ${page}`);
@@ -115,6 +143,7 @@ exports.listUsers = async (req, res) => {
       totalPages,
       currentPage: parseInt(page, 10),
       users: rows.map(excludeSensitiveInfo),
+      dashboardInfo,
     });
   } catch (error) {
     logger.error(error);
